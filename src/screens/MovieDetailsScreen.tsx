@@ -102,7 +102,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
         )}
 
         {/* Info card */}
-        <View className="px-4 -mt-16 pb-10">
+        <View className="px-4 pb-10" style={{ marginTop: -64 }}>
           <View className="bg-card rounded-xl p-6">
             <Text className="text-white text-2xl font-bold mb-3">{movie.title}</Text>
 

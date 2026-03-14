@@ -119,9 +119,7 @@ export default function UpcomingScreen() {
                     <Text className="text-primary text-xs font-semibold">
                       {days > 0
                         ? `Releases in ${days} days`
-                        : days === 0
-                        ? 'Releases today!'
-                        : 'Released'}
+                        : 'Releases today!'}
                     </Text>
                   </View>
                 </View>
