@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../store/authStore';
 import type { AuthStackScreenProps } from '../navigation/types';
 
@@ -21,13 +22,16 @@ export default function LoginScreen() {
 
   return (
     <View className="flex-1 bg-background justify-center px-8">
-      <Text className="text-primary text-3xl font-bold text-center mb-2">
-        Movie Catalog
-      </Text>
-      <Text className="text-muted text-base text-center mb-8">
-        Sign in to continue
-      </Text>
+      {/* Logo */}
+      <View className="items-center mb-12">
+        <View className="bg-primary p-4 rounded-2xl mb-4">
+          <Ionicons name="film" size={48} color="#FFFFFF" />
+        </View>
+        <Text className="text-white text-3xl font-medium">Movie Catalog</Text>
+        <Text className="text-muted text-sm mt-2">Your personal cinema</Text>
+      </View>
 
+      {/* Form */}
       <TextInput
         className="bg-card border border-border rounded-xl text-white text-base px-4 py-3.5 mb-4"
         placeholder="Email"
@@ -51,13 +55,13 @@ export default function LoginScreen() {
         onPress={handleLogin}
         activeOpacity={0.8}
       >
-        <Text className="text-white text-base font-semibold">Log In</Text>
+        <Text className="text-white text-base font-semibold">Login</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate('Register')} activeOpacity={0.7}>
         <Text className="text-muted text-sm text-center">
           Don't have an account?{' '}
-          <Text className="text-primary font-semibold">Register</Text>
+          <Text className="text-primary font-semibold">Create one</Text>
         </Text>
       </TouchableOpacity>
     </View>

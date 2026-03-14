@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import {
   View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getMovieDetails, type TMDBMovieDetails } from '../services/movieService';
 import { posterSize } from '../services/apiClient';
 import { useMovieStore } from '../store/movieStore';
@@ -10,11 +12,13 @@ import type { RootStackScreenProps } from '../navigation/types';
 
 export default function MovieDetailsScreen({ route }: RootStackScreenProps<'MovieDetails'>) {
   const { movieId } = route.params;
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const [movie, setMovie] = useState<TMDBMovieDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { addMovie, deleteMovie, isMovieSaved } = useMovieStore();
+  const { addMovie, deleteMovie } = useMovieStore();
   const saved = useMovieStore((s) => s.isMovieSaved(String(movieId)));
 
   useEffect(() => {
@@ -61,75 +65,111 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
     );
   }
 
+  const posterUri = movie.poster_path
+    ? `${posterSize('w780')}${movie.poster_path}`
+    : movie.backdrop_path
+    ? `${posterSize('w780')}${movie.backdrop_path}`
+    : null;
+
   return (
-    <ScrollView className="flex-1 bg-background">
-      {movie.backdrop_path ? (
-        <Image
-          source={{ uri: `${posterSize('w780')}${movie.backdrop_path}` }}
-          className="w-full h-56"
-          resizeMode="cover"
-        />
-      ) : movie.poster_path ? (
-        <Image
-          source={{ uri: `${posterSize('w780')}${movie.poster_path}` }}
-          className="w-full h-56"
-          resizeMode="cover"
-        />
-      ) : (
-        <View className="w-full h-56 bg-card items-center justify-center">
-          <Ionicons name="film-outline" size={64} color="#AAAAAA" />
-        </View>
-      )}
+    <View className="flex-1 bg-background">
+      {/* Back button */}
+      <TouchableOpacity
+        className="absolute z-10 bg-black/50 p-2 rounded-full"
+        style={{ top: insets.top + 8, left: 16 }}
+        onPress={() => navigation.goBack()}
+        activeOpacity={0.7}
+      >
+        <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+      </TouchableOpacity>
 
-      <View className="px-6 pt-5 pb-10">
-        <Text className="text-white text-2xl font-bold mb-1">{movie.title}</Text>
-
-        <View className="flex-row items-center gap-3 mb-4">
-          <Text className="text-muted text-sm">{movie.release_date?.slice(0, 4)}</Text>
-          {movie.runtime && (
-            <Text className="text-muted text-sm">{movie.runtime} min</Text>
-          )}
-          <View className="flex-row items-center gap-1">
-            <Ionicons name="star" size={14} color="#E50914" />
-            <Text className="text-white text-sm font-semibold">
-              {movie.vote_average.toFixed(1)}
-            </Text>
+      <ScrollView className="flex-1" bounces={false}>
+        {/* Full-width poster */}
+        {posterUri ? (
+          <View className="w-full h-[500px]">
+            <Image
+              source={{ uri: posterUri }}
+              className="w-full h-full"
+              resizeMode="cover"
+            />
+            {/* Gradient overlay */}
+            <View className="absolute inset-x-0 bottom-0 h-40 bg-background" style={{ opacity: 0.9 }} />
           </View>
-        </View>
-
-        {movie.genres.length > 0 && (
-          <View className="flex-row flex-wrap gap-2 mb-4">
-            {movie.genres.map((g) => (
-              <View key={g.id} className="bg-card border border-border rounded-full px-3 py-1">
-                <Text className="text-muted text-xs">{g.name}</Text>
-              </View>
-            ))}
+        ) : (
+          <View className="w-full h-64 bg-card items-center justify-center">
+            <Ionicons name="film-outline" size={64} color="#AAAAAA" />
           </View>
         )}
 
-        {movie.tagline ? (
-          <Text className="text-muted text-sm italic mb-3">{movie.tagline}</Text>
-        ) : null}
+        {/* Info card */}
+        <View className="px-4 -mt-16 pb-10">
+          <View className="bg-card rounded-xl p-6">
+            <Text className="text-white text-2xl font-bold mb-3">{movie.title}</Text>
 
-        <Text className="text-muted text-[15px] leading-6 mb-8">{movie.overview}</Text>
+            {/* Year & Rating */}
+            <View className="flex-row items-center gap-4 mb-4">
+              <Text className="text-muted">{movie.release_date?.slice(0, 4)}</Text>
+              {movie.runtime && (
+                <Text className="text-muted">{movie.runtime} min</Text>
+              )}
+              <View className="flex-row items-center gap-1.5">
+                <Ionicons name="star" size={18} color="#E50914" />
+                <Text className="text-white font-semibold">
+                  {movie.vote_average.toFixed(1)}/10
+                </Text>
+              </View>
+            </View>
 
-        <TouchableOpacity
-          className={`rounded-xl py-4 flex-row items-center justify-center gap-2 ${
-            saved ? 'bg-card border border-border' : 'bg-primary'
-          }`}
-          onPress={toggleSaved}
-          activeOpacity={0.8}
-        >
-          <Ionicons
-            name={saved ? 'heart' : 'heart-outline'}
-            size={20}
-            color={saved ? '#E50914' : '#FFFFFF'}
-          />
-          <Text className={`text-base font-semibold ${saved ? 'text-primary' : 'text-white'}`}>
-            {saved ? 'Remove from My Movies' : 'Add to My Movies'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+            {/* Genre tags */}
+            {movie.genres.length > 0 && (
+              <View className="flex-row flex-wrap gap-2 mb-6">
+                {movie.genres.map((g) => (
+                  <View key={g.id} className="rounded-full px-3 py-1 border border-primary bg-primary/10">
+                    <Text className="text-primary text-xs">{g.name}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* Synopsis */}
+            <Text className="text-white font-semibold mb-2">Synopsis</Text>
+            <Text className="text-muted text-[15px] leading-6 mb-6">{movie.overview}</Text>
+
+            {/* Action buttons */}
+            <TouchableOpacity
+              className={`rounded-xl py-4 flex-row items-center justify-center gap-2 mb-3 ${
+                saved ? 'bg-border border border-primary' : 'bg-primary'
+              }`}
+              onPress={toggleSaved}
+              activeOpacity={0.8}
+            >
+              <Ionicons
+                name={saved ? 'checkmark' : 'add'}
+                size={20}
+                color={saved ? '#E50914' : '#FFFFFF'}
+              />
+              <Text className={`text-base font-semibold ${saved ? 'text-white' : 'text-white'}`}>
+                {saved ? 'In My Movies' : 'Add to My Movies'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="rounded-xl py-4 flex-row items-center justify-center gap-2 bg-card border border-border"
+              activeOpacity={0.8}
+              onPress={() =>
+                navigation.navigate('AddReview', {
+                  movieId: movie.id,
+                  movieTitle: movie.title,
+                  moviePoster: movie.poster_path,
+                })
+              }
+            >
+              <Ionicons name="create-outline" size={20} color="#FFFFFF" />
+              <Text className="text-white text-base font-semibold">Write Review</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </View>
   );
 }

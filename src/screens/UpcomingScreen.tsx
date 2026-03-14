@@ -11,8 +11,15 @@ import { posterSize } from '../services/apiClient';
 function daysUntil(dateStr: string): number {
   const release = new Date(dateStr);
   const now = new Date();
-  const diff = release.getTime() - now.getTime();
-  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  return Math.max(0, Math.ceil((release.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+}
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
 }
 
 export default function UpcomingScreen() {
@@ -66,7 +73,7 @@ export default function UpcomingScreen() {
   return (
     <View className="flex-1 bg-background">
       <Text className="text-white text-2xl font-bold px-5 pt-14 pb-4">
-        Upcoming
+        Upcoming Releases
       </Text>
       <FlatList
         data={movies}
@@ -79,34 +86,45 @@ export default function UpcomingScreen() {
           const days = daysUntil(item.release_date);
           return (
             <TouchableOpacity
-              className="flex-row items-center gap-4 bg-card rounded-xl mb-3 border border-border overflow-hidden"
+              className="bg-card rounded-xl mb-3 overflow-hidden flex-row"
               activeOpacity={0.7}
               onPress={() => navigation.navigate('MovieDetails', { movieId: item.id })}
             >
               {item.poster_path ? (
                 <Image
                   source={{ uri: `${posterSize('w185')}${item.poster_path}` }}
-                  className="w-20 h-28"
+                  className="w-28 h-40"
                   resizeMode="cover"
                 />
               ) : (
-                <View className="w-20 h-28 bg-border items-center justify-center">
+                <View className="w-28 h-40 bg-border items-center justify-center">
                   <Ionicons name="film-outline" size={24} color="#AAAAAA" />
                 </View>
               )}
-              <View className="flex-1 py-3 pr-4">
+              <View className="flex-1 py-4 pr-4 pl-4">
                 <Text className="text-white text-base font-semibold" numberOfLines={2}>
                   {item.title}
                 </Text>
-                <Text className="text-muted text-sm mt-1">{item.release_date}</Text>
-                {days > 0 && (
-                  <View className="flex-row items-center gap-1 mt-1.5">
-                    <Ionicons name="time-outline" size={14} color="#E50914" />
+                <Text className="text-muted text-sm mt-1">{item.release_date?.slice(0, 4)}</Text>
+
+                {/* Date */}
+                <View className="flex-row items-center gap-2 mt-3">
+                  <Ionicons name="calendar-outline" size={16} color="#AAAAAA" />
+                  <Text className="text-muted text-sm">{formatDate(item.release_date)}</Text>
+                </View>
+
+                {/* Countdown pill */}
+                <View className="mt-auto pt-3">
+                  <View className="self-start rounded-full px-3 py-1.5 border border-primary bg-primary/10">
                     <Text className="text-primary text-xs font-semibold">
-                      {days} day{days !== 1 ? 's' : ''} away
+                      {days > 0
+                        ? `Releases in ${days} days`
+                        : days === 0
+                        ? 'Releases today!'
+                        : 'Released'}
                     </Text>
                   </View>
-                )}
+                </View>
               </View>
             </TouchableOpacity>
           );

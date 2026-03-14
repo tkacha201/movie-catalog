@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../store/authStore';
 import type { AuthStackScreenProps } from '../navigation/types';
 
@@ -8,12 +9,13 @@ export default function RegisterScreen() {
   const navigation = useNavigation<AuthStackScreenProps<'Register'>['navigation']>();
   const register = useAuthStore((s) => s.register);
 
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleRegister = async () => {
-    if (!name.trim() || !email.trim() || !password.trim()) {
+    if (!username.trim() || !email.trim() || !password.trim()) {
       Alert.alert('Error', 'Please fill in all fields.');
       return;
     }
@@ -21,8 +23,12 @@ export default function RegisterScreen() {
       Alert.alert('Error', 'Password must be at least 6 characters.');
       return;
     }
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match.');
+      return;
+    }
     try {
-      await register(name.trim(), email.trim(), password);
+      await register(username.trim(), email.trim(), password);
     } catch {
       Alert.alert('Error', 'Registration failed. Please try again.');
     }
@@ -30,20 +36,23 @@ export default function RegisterScreen() {
 
   return (
     <View className="flex-1 bg-background justify-center px-8">
-      <Text className="text-primary text-3xl font-bold text-center mb-2">
-        Create Account
-      </Text>
-      <Text className="text-muted text-base text-center mb-8">
-        Join Movie Catalog
-      </Text>
+      {/* Logo */}
+      <View className="items-center mb-12">
+        <View className="bg-primary p-4 rounded-2xl mb-4">
+          <Ionicons name="film" size={48} color="#FFFFFF" />
+        </View>
+        <Text className="text-primary text-3xl font-medium">Create Account</Text>
+        <Text className="text-muted text-sm mt-2">Join the community</Text>
+      </View>
 
+      {/* Form */}
       <TextInput
         className="bg-card border border-border rounded-xl text-white text-base px-4 py-3.5 mb-4"
-        placeholder="Full Name"
+        placeholder="Username"
         placeholderTextColor="#AAAAAA"
-        autoCapitalize="words"
-        value={name}
-        onChangeText={setName}
+        autoCapitalize="none"
+        value={username}
+        onChangeText={setUsername}
       />
       <TextInput
         className="bg-card border border-border rounded-xl text-white text-base px-4 py-3.5 mb-4"
@@ -62,6 +71,14 @@ export default function RegisterScreen() {
         value={password}
         onChangeText={setPassword}
       />
+      <TextInput
+        className="bg-card border border-border rounded-xl text-white text-base px-4 py-3.5 mb-4"
+        placeholder="Confirm Password"
+        placeholderTextColor="#AAAAAA"
+        secureTextEntry
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+      />
 
       <TouchableOpacity
         className="bg-primary rounded-xl py-4 items-center mt-2 mb-6"
@@ -74,7 +91,7 @@ export default function RegisterScreen() {
       <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
         <Text className="text-muted text-sm text-center">
           Already have an account?{' '}
-          <Text className="text-primary font-semibold">Log In</Text>
+          <Text className="text-primary font-semibold">Login</Text>
         </Text>
       </TouchableOpacity>
     </View>

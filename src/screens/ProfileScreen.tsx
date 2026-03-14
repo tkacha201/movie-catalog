@@ -9,29 +9,51 @@ export default function ProfileScreen() {
   const savedCount = useMovieStore((s) => s.savedMovies.length);
 
   return (
-    <View className="flex-1 bg-background items-center justify-center px-8">
-      <View className="w-24 h-24 rounded-full bg-card items-center justify-center mb-4 border-2 border-border">
-        <Ionicons name="person" size={48} color="#AAAAAA" />
+    <View className="flex-1 bg-background">
+      <View className="px-4 pt-14 pb-6">
+        <Text className="text-white text-2xl font-bold mb-8">Profile</Text>
+
+        {/* Profile Card */}
+        <View className="bg-card rounded-xl p-6 mb-6">
+          <View className="items-center mb-6">
+            <View className="bg-primary p-6 rounded-full mb-4">
+              <Ionicons name="person" size={48} color="#FFFFFF" />
+            </View>
+            <Text className="text-white text-xl font-semibold">
+              {user?.username ?? 'Guest'}
+            </Text>
+          </View>
+
+          <View className="bg-background rounded-xl p-3 flex-row items-center gap-3">
+            <Ionicons name="mail-outline" size={20} color="#AAAAAA" />
+            <View>
+              <Text className="text-muted text-xs">Email</Text>
+              <Text className="text-white text-base">{user?.email ?? ''}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Saved Movies Card */}
+        <View className="bg-card rounded-xl p-6 mb-6">
+          <Text className="text-white text-base font-semibold mb-3">Your Movies</Text>
+          <View className="flex-row items-center gap-3">
+            <Ionicons name="film" size={20} color="#E50914" />
+            <Text className="text-white text-base">
+              {savedCount} {savedCount === 1 ? 'movie' : 'movies'} saved
+            </Text>
+          </View>
+        </View>
+
+        {/* Logout */}
+        <TouchableOpacity
+          className="bg-card rounded-xl py-4 flex-row items-center justify-center gap-2 border border-primary"
+          onPress={logout}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="log-out-outline" size={20} color="#E50914" />
+          <Text className="text-primary text-base font-semibold">Logout</Text>
+        </TouchableOpacity>
       </View>
-
-      <Text className="text-white text-xl font-semibold mb-1">
-        {user?.name ?? 'Guest'}
-      </Text>
-      <Text className="text-muted text-sm mb-6">{user?.email ?? ''}</Text>
-
-      <View className="bg-card rounded-xl px-8 py-4 mb-10 border border-border items-center">
-        <Text className="text-white text-2xl font-bold">{savedCount}</Text>
-        <Text className="text-muted text-sm mt-1">Saved Movies</Text>
-      </View>
-
-      <TouchableOpacity
-        className="bg-primary rounded-xl py-3.5 px-8 flex-row items-center gap-2"
-        onPress={logout}
-        activeOpacity={0.8}
-      >
-        <Ionicons name="log-out-outline" size={20} color="#FFFFFF" />
-        <Text className="text-white text-base font-semibold">Log Out</Text>
-      </TouchableOpacity>
     </View>
   );
 }

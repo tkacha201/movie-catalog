@@ -5,7 +5,7 @@ const AUTH_STORAGE_KEY = 'auth_user';
 
 export interface User {
   id: string;
-  name: string;
+  username: string;
   email: string;
 }
 
@@ -14,7 +14,7 @@ interface AuthState {
   isLoggedIn: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   restoreSession: () => Promise<void>;
 }
@@ -28,18 +28,18 @@ export const useAuthStore = create<AuthState>((set) => ({
     // TODO: replace with Firebase Auth
     const user: User = {
       id: Date.now().toString(),
-      name: email.split('@')[0],
+      username: email.split('@')[0],
       email,
     };
     await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
     set({ user, isLoggedIn: true });
   },
 
-  register: async (name, email, _password) => {
+  register: async (username, email, _password) => {
     // TODO: replace with Firebase Auth
     const user: User = {
       id: Date.now().toString(),
-      name,
+      username,
       email,
     };
     await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));

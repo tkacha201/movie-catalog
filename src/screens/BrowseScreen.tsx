@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
-  View, Text, FlatList, TouchableOpacity, Image,
+  View, Text, FlatList, TouchableOpacity, Image, TextInput,
   ActivityIndicator, RefreshControl,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { discoverMovies, type TMDBMovie } from '../services/movieService';
+import { Ionicons } from '@expo/vector-icons';
+import { discoverMovies, searchMovies, type TMDBMovie } from '../services/movieService';
 import { posterSize } from '../services/apiClient';
 
 export default function BrowseScreen() {
@@ -13,11 +14,14 @@ export default function BrowseScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
 
-  const fetchMovies = useCallback(async () => {
+  const fetchMovies = useCallback(async (searchQuery?: string) => {
     try {
       setError(null);
-      const data = await discoverMovies();
+      const data = searchQuery?.trim()
+        ? await searchMovies(searchQuery.trim())
+        : await discoverMovies();
       setMovies(data.results);
     } catch {
       setError('Failed to load movies.');
@@ -31,9 +35,16 @@ export default function BrowseScreen() {
     fetchMovies();
   }, [fetchMovies]);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!loading) fetchMovies(query);
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [query, fetchMovies, loading]);
+
   const onRefresh = () => {
     setRefreshing(true);
-    fetchMovies();
+    fetchMovies(query);
   };
 
   if (loading) {
@@ -48,7 +59,7 @@ export default function BrowseScreen() {
     return (
       <View className="flex-1 bg-background items-center justify-center px-8">
         <Text className="text-white text-base mb-4">{error}</Text>
-        <TouchableOpacity className="bg-primary rounded-xl py-3 px-6" onPress={fetchMovies}>
+        <TouchableOpacity className="bg-primary rounded-xl py-3 px-6" onPress={() => fetchMovies(query)}>
           <Text className="text-white font-semibold">Retry</Text>
         </TouchableOpacity>
       </View>
@@ -57,17 +68,42 @@ export default function BrowseScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <Text className="text-white text-2xl font-bold px-5 pt-14 pb-4">
-        Browse Movies
-      </Text>
+      <View className="px-4 pt-14 pb-2">
+        <Text className="text-white text-2xl font-bold mb-4">Browse Movies</Text>
+
+        {/* Search Bar */}
+        <View className="flex-row items-center bg-card border border-border rounded-xl px-4 h-12">
+          <Ionicons name="search" size={20} color="#AAAAAA" />
+          <TextInput
+            className="flex-1 text-white text-base ml-3"
+            placeholder="Search movies..."
+            placeholderTextColor="#AAAAAA"
+            value={query}
+            onChangeText={setQuery}
+            autoCapitalize="none"
+            returnKeyType="search"
+          />
+          {query.length > 0 && (
+            <TouchableOpacity onPress={() => setQuery('')}>
+              <Ionicons name="close-circle" size={20} color="#AAAAAA" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
       <FlatList
         data={movies}
         keyExtractor={(item) => String(item.id)}
         numColumns={2}
-        contentContainerClassName="px-3 pb-5"
+        contentContainerClassName="px-3 pb-5 pt-3"
         columnWrapperClassName="gap-3 mb-3"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E50914" />
+        }
+        ListEmptyComponent={
+          <View className="items-center py-12">
+            <Text className="text-muted">No movies found</Text>
+          </View>
         }
         renderItem={({ item }) => (
           <TouchableOpacity

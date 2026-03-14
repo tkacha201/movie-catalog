@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AuthStack from './AuthStack';
 import MainTabs from './MainTabs';
 import MovieDetailsScreen from '../screens/MovieDetailsScreen';
+import AddReviewScreen from '../screens/AddReviewScreen';
 import { useAuthStore } from '../store/authStore';
 import { Colors } from '../theme/colors';
 import type { RootStackParamList } from './types';
@@ -39,7 +40,12 @@ export default function RootNavigator() {
           <Stack.Screen
             name="MovieDetails"
             component={MovieDetailsScreen}
-            options={{ title: 'Movie Details' }}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="AddReview"
+            component={AddReviewScreen}
+            options={{ title: 'Add Review' }}
           />
         </>
       ) : (

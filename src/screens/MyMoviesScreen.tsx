@@ -22,14 +22,24 @@ export default function MyMoviesScreen() {
         <Text className="text-white text-2xl font-bold px-5 pt-14 pb-4">
           My Movies
         </Text>
-        <View className="flex-1 items-center justify-center pb-20">
-          <Ionicons name="heart-outline" size={48} color="#AAAAAA" />
-          <Text className="text-white text-lg font-semibold mt-4">
-            No movies saved yet
+        <View className="flex-1 items-center justify-center pb-20 px-6">
+          {/* Icon with glow */}
+          <View className="mb-6">
+            <View className="bg-card p-8 rounded-full">
+              <Ionicons name="film" size={64} color="#E50914" />
+            </View>
+          </View>
+          <Text className="text-white text-xl font-semibold mb-2">No Movies Yet</Text>
+          <Text className="text-muted text-center mb-8">
+            You haven't added any movies yet
           </Text>
-          <Text className="text-muted text-sm mt-2">
-            Browse movies and add them to your list
-          </Text>
+          <TouchableOpacity
+            className="bg-primary rounded-xl py-3.5 px-8"
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('Main', { screen: 'Browse' })}
+          >
+            <Text className="text-white text-base font-semibold">Browse Movies</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -45,46 +55,65 @@ export default function MyMoviesScreen() {
         keyExtractor={(item) => item.id}
         contentContainerClassName="px-5 pb-5"
         renderItem={({ item }) => (
-          <TouchableOpacity
-            className="flex-row bg-card rounded-xl mb-3 border border-border overflow-hidden"
-            activeOpacity={0.7}
-            onPress={() => navigation.navigate('MovieDetails', { movieId: Number(item.id) })}
-          >
-            {item.posterPath ? (
-              <Image
-                source={{ uri: `${posterSize('w185')}${item.posterPath}` }}
-                className="w-20 h-28"
-                resizeMode="cover"
-              />
-            ) : (
-              <View className="w-20 h-28 bg-border items-center justify-center">
-                <Ionicons name="film-outline" size={24} color="#AAAAAA" />
-              </View>
-            )}
-            <View className="flex-1 py-3 px-4 justify-center">
-              <Text className="text-white text-base font-semibold" numberOfLines={2}>
-                {item.title}
-              </Text>
-              <Text className="text-muted text-sm mt-1">
-                {item.releaseDate?.slice(0, 4)}
-              </Text>
-              {item.rating > 0 && (
-                <View className="flex-row items-center gap-1 mt-1">
-                  <Ionicons name="star" size={12} color="#E50914" />
-                  <Text className="text-primary text-xs font-semibold">
-                    Your rating: {item.rating}/10
-                  </Text>
+          <View className="bg-card rounded-xl mb-3 overflow-hidden flex-row">
+            <TouchableOpacity
+              className="flex-row flex-1"
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('MovieDetails', { movieId: Number(item.id) })}
+            >
+              {item.posterPath ? (
+                <Image
+                  source={{ uri: `${posterSize('w185')}${item.posterPath}` }}
+                  className="w-24 h-36"
+                  resizeMode="cover"
+                />
+              ) : (
+                <View className="w-24 h-36 bg-border items-center justify-center">
+                  <Ionicons name="film-outline" size={24} color="#AAAAAA" />
                 </View>
               )}
-            </View>
-            <TouchableOpacity
-              className="px-4 items-center justify-center"
-              onPress={() => confirmDelete(item)}
-              activeOpacity={0.6}
-            >
-              <Ionicons name="trash-outline" size={20} color="#E50914" />
+              <View className="flex-1 py-3 px-4">
+                <Text className="text-white text-base font-semibold" numberOfLines={2}>
+                  {item.title}
+                </Text>
+                <Text className="text-muted text-sm mt-1">
+                  {item.releaseDate?.slice(0, 4)}
+                </Text>
+                {item.rating > 0 && (
+                  <View className="flex-row items-center gap-1 mt-2">
+                    <Ionicons name="star" size={14} color="#E50914" />
+                    <Text className="text-white text-sm">{item.rating}/10</Text>
+                  </View>
+                )}
+                {item.review ? (
+                  <Text className="text-muted text-sm mt-1" numberOfLines={2}>
+                    {item.review}
+                  </Text>
+                ) : null}
+
+                <View className="flex-row items-center gap-4 mt-auto pt-2">
+                  <TouchableOpacity
+                    className="flex-row items-center gap-1"
+                    onPress={() => navigation.navigate('AddReview', {
+                      movieId: Number(item.id),
+                      movieTitle: item.title,
+                      moviePoster: item.posterPath,
+                    })}
+                  >
+                    <Ionicons name="create-outline" size={16} color="#E50914" />
+                    <Text className="text-primary text-sm">Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className="flex-row items-center gap-1"
+                    onPress={() => confirmDelete(item)}
+                  >
+                    <Ionicons name="trash-outline" size={16} color="#AAAAAA" />
+                    <Text className="text-muted text-sm">Remove</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </TouchableOpacity>
-          </TouchableOpacity>
+          </View>
         )}
       />
     </View>
