@@ -1,13 +1,31 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useAuthStore } from '../store/authStore';
 import type { AuthStackScreenProps } from '../navigation/types';
 
 export default function RegisterScreen() {
   const navigation = useNavigation<AuthStackScreenProps<'Register'>['navigation']>();
+  const register = useAuthStore((s) => s.register);
 
-  const handleRegister = () => {
-    navigation.getParent()?.reset({ index: 0, routes: [{ name: 'Main' }] });
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleRegister = async () => {
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      Alert.alert('Error', 'Please fill in all fields.');
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters.');
+      return;
+    }
+    try {
+      await register(name.trim(), email.trim(), password);
+    } catch {
+      Alert.alert('Error', 'Registration failed. Please try again.');
+    }
   };
 
   return (
@@ -24,6 +42,8 @@ export default function RegisterScreen() {
         placeholder="Full Name"
         placeholderTextColor="#AAAAAA"
         autoCapitalize="words"
+        value={name}
+        onChangeText={setName}
       />
       <TextInput
         className="bg-card border border-border rounded-xl text-white text-base px-4 py-3.5 mb-4"
@@ -31,12 +51,16 @@ export default function RegisterScreen() {
         placeholderTextColor="#AAAAAA"
         keyboardType="email-address"
         autoCapitalize="none"
+        value={email}
+        onChangeText={setEmail}
       />
       <TextInput
         className="bg-card border border-border rounded-xl text-white text-base px-4 py-3.5 mb-4"
         placeholder="Password"
         placeholderTextColor="#AAAAAA"
         secureTextEntry
+        value={password}
+        onChangeText={setPassword}
       />
 
       <TouchableOpacity

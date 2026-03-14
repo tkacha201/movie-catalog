@@ -1,13 +1,26 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useAuthStore } from '../store/authStore';
 import type { AuthStackScreenProps } from '../navigation/types';
 
 export default function LoginScreen() {
   const navigation = useNavigation<AuthStackScreenProps<'Login'>['navigation']>();
+  const login = useAuthStore((s) => s.login);
 
-  const handleLogin = () => {
-    navigation.getParent()?.reset({ index: 0, routes: [{ name: 'Main' }] });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert('Error', 'Please fill in all fields.');
+      return;
+    }
+    try {
+      await login(email.trim(), password);
+    } catch {
+      Alert.alert('Error', 'Login failed. Please try again.');
+    }
   };
 
   return (
@@ -25,12 +38,16 @@ export default function LoginScreen() {
         placeholderTextColor="#AAAAAA"
         keyboardType="email-address"
         autoCapitalize="none"
+        value={email}
+        onChangeText={setEmail}
       />
       <TextInput
         className="bg-card border border-border rounded-xl text-white text-base px-4 py-3.5 mb-4"
         placeholder="Password"
         placeholderTextColor="#AAAAAA"
         secureTextEntry
+        value={password}
+        onChangeText={setPassword}
       />
 
       <TouchableOpacity
