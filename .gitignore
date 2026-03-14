@@ -40,4 +40,8 @@ yarn-error.*
 /ios
 /android
 
+# UI Design from figma
 Movie Catalog App UI Design/
+
+#project spec made before project started
+PROJECT_SPEC.md
