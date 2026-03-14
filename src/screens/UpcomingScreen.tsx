@@ -11,7 +11,7 @@ import { posterSize } from '../services/apiClient';
 function daysUntil(dateStr: string): number {
   const release = new Date(dateStr);
   const now = new Date();
-  return Math.max(0, Math.ceil((release.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+  return Math.ceil((release.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 function formatDate(dateStr: string): string {
@@ -115,7 +115,7 @@ export default function UpcomingScreen() {
 
                 {/* Countdown pill */}
                 <View className="mt-auto pt-3">
-                  <View className="self-start rounded-full px-3 py-1.5 border border-primary bg-primary/10">
+                  <View className="self-start rounded-full px-3 py-1.5 border border-primary" style={{ backgroundColor: 'rgba(229, 9, 20, 0.1)' }}>
                     <Text className="text-primary text-xs font-semibold">
                       {days > 0
                         ? `Releases in ${days} days`

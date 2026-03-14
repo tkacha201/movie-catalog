@@ -124,7 +124,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
             {movie.genres.length > 0 && (
               <View className="flex-row flex-wrap gap-2 mb-6">
                 {movie.genres.map((g) => (
-                  <View key={g.id} className="rounded-full px-3 py-1 border border-primary bg-primary/10">
+                  <View key={g.id} className="rounded-full px-3 py-1 border border-primary" style={{ backgroundColor: 'rgba(229, 9, 20, 0.1)' }}>
                     <Text className="text-primary text-xs">{g.name}</Text>
                   </View>
                 ))}
