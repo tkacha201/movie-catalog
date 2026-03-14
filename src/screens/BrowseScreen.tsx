@@ -1,18 +1,59 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  View, Text, FlatList, TouchableOpacity, Image,
+  ActivityIndicator, RefreshControl,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
-const SAMPLE_MOVIES = [
-  { id: '1', title: 'The Shawshank Redemption', year: 1994 },
-  { id: '2', title: 'The Dark Knight', year: 2008 },
-  { id: '3', title: 'Inception', year: 2010 },
-  { id: '4', title: 'Pulp Fiction', year: 1994 },
-  { id: '5', title: 'The Matrix', year: 1999 },
-  { id: '6', title: 'Interstellar', year: 2014 },
-];
+import { discoverMovies, type TMDBMovie } from '../services/movieService';
+import { posterSize } from '../services/apiClient';
 
 export default function BrowseScreen() {
   const navigation = useNavigation();
+  const [movies, setMovies] = useState<TMDBMovie[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchMovies = useCallback(async () => {
+    try {
+      setError(null);
+      const data = await discoverMovies();
+      setMovies(data.results);
+    } catch {
+      setError('Failed to load movies.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMovies();
+  }, [fetchMovies]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchMovies();
+  };
+
+  if (loading) {
+    return (
+      <View className="flex-1 bg-background items-center justify-center">
+        <ActivityIndicator size="large" color="#E50914" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 bg-background items-center justify-center px-8">
+        <Text className="text-white text-base mb-4">{error}</Text>
+        <TouchableOpacity className="bg-primary rounded-xl py-3 px-6" onPress={fetchMovies}>
+          <Text className="text-white font-semibold">Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-background">
@@ -20,17 +61,39 @@ export default function BrowseScreen() {
         Browse Movies
       </Text>
       <FlatList
-        data={SAMPLE_MOVIES}
-        keyExtractor={(item) => item.id}
-        contentContainerClassName="px-5 pb-5"
+        data={movies}
+        keyExtractor={(item) => String(item.id)}
+        numColumns={2}
+        contentContainerClassName="px-3 pb-5"
+        columnWrapperClassName="gap-3 mb-3"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E50914" />
+        }
         renderItem={({ item }) => (
           <TouchableOpacity
-            className="bg-card rounded-xl p-4 mb-3 border border-border"
+            className="flex-1 bg-card rounded-xl overflow-hidden border border-border"
             activeOpacity={0.7}
             onPress={() => navigation.navigate('MovieDetails', { movieId: item.id })}
           >
-            <Text className="text-white text-base font-semibold">{item.title}</Text>
-            <Text className="text-muted text-sm mt-1">{item.year}</Text>
+            {item.poster_path ? (
+              <Image
+                source={{ uri: `${posterSize('w342')}${item.poster_path}` }}
+                className="w-full aspect-[2/3]"
+                resizeMode="cover"
+              />
+            ) : (
+              <View className="w-full aspect-[2/3] bg-border items-center justify-center">
+                <Text className="text-muted text-xs">No Image</Text>
+              </View>
+            )}
+            <View className="p-2.5">
+              <Text className="text-white text-sm font-semibold" numberOfLines={1}>
+                {item.title}
+              </Text>
+              <Text className="text-muted text-xs mt-0.5">
+                {item.release_date?.slice(0, 4)}
+              </Text>
+            </View>
           </TouchableOpacity>
         )}
       />
