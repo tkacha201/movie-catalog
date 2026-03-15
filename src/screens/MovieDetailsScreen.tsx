@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   View, Text, Image, ScrollView, TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getMovieDetails, type TMDBMovieDetails } from '../services/movieService';
 import { posterSize } from '../services/apiClient';
 import { useMovieStore } from '../store/movieStore';
 import type { RootStackScreenProps } from '../navigation/types';
 import { Colors } from '../theme/colors';
+import { useMovieDetails } from '../hooks/useMovieDetails';
 import LoadingScreen from '../components/LoadingScreen';
 import ErrorScreen from '../components/ErrorScreen';
 
@@ -17,25 +17,10 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
   const { movieId } = route.params;
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const [movie, setMovie] = useState<TMDBMovieDetails | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { movie, loading, error } = useMovieDetails(movieId);
 
   const { addMovie, deleteMovie } = useMovieStore();
   const saved = useMovieStore((s) => s.isMovieSaved(String(movieId)));
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await getMovieDetails(movieId);
-        setMovie(data);
-      } catch {
-        setError('Failed to load movie details.');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [movieId]);
 
   const toggleSaved = () => {
     if (!movie) return;

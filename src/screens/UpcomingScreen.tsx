@@ -1,13 +1,13 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React from 'react';
 import {
   View, Text, FlatList, Image, TouchableOpacity,
   RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getUpcomingMovies, type TMDBMovie } from '../services/movieService';
 import { posterSize } from '../services/apiClient';
 import { Colors } from '../theme/colors';
 import { useAppNavigation } from '../hooks/useAppNavigation';
+import { useUpcoming } from '../hooks/useUpcoming';
 import LoadingScreen from '../components/LoadingScreen';
 import ErrorScreen from '../components/ErrorScreen';
 
@@ -27,36 +27,11 @@ function formatDate(dateStr: string): string {
 
 export default function UpcomingScreen() {
   const navigation = useAppNavigation();
-  const [movies, setMovies] = useState<TMDBMovie[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchUpcoming = useCallback(async () => {
-    try {
-      setError(null);
-      const data = await getUpcomingMovies();
-      setMovies(data.results);
-    } catch {
-      setError('Failed to load upcoming movies.');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchUpcoming();
-  }, [fetchUpcoming]);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchUpcoming();
-  };
+  const { movies, loading, error, refreshing, refresh } = useUpcoming();
 
   if (loading) return <LoadingScreen />;
 
-  if (error) return <ErrorScreen message={error} onRetry={fetchUpcoming} />;
+  if (error) return <ErrorScreen message={error} onRetry={refresh} />;
 
   return (
     <View className="flex-1 bg-background">
@@ -68,7 +43,7 @@ export default function UpcomingScreen() {
         keyExtractor={(item) => String(item.id)}
         contentContainerClassName="px-5 pb-5"
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
+          <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={Colors.primary} />
         }
         renderItem={({ item }) => {
           const days = daysUntil(item.release_date);

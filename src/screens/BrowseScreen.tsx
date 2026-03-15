@@ -1,58 +1,23 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, Image, TextInput,
   RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { discoverMovies, searchMovies, type TMDBMovie } from '../services/movieService';
 import { posterSize } from '../services/apiClient';
 import { Colors } from '../theme/colors';
 import { useAppNavigation } from '../hooks/useAppNavigation';
+import { useMovies } from '../hooks/useMovies';
 import LoadingScreen from '../components/LoadingScreen';
 import ErrorScreen from '../components/ErrorScreen';
 
 export default function BrowseScreen() {
   const navigation = useAppNavigation();
-  const [movies, setMovies] = useState<TMDBMovie[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useState('');
-
-  const fetchMovies = useCallback(async (searchQuery?: string) => {
-    try {
-      setError(null);
-      const data = searchQuery?.trim()
-        ? await searchMovies(searchQuery.trim())
-        : await discoverMovies();
-      setMovies(data.results);
-    } catch {
-      setError('Failed to load movies.');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchMovies();
-  }, [fetchMovies]);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (!loading) fetchMovies(query);
-    }, 500);
-    return () => clearTimeout(timeout);
-  }, [query, fetchMovies, loading]);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchMovies(query);
-  };
+  const { movies, loading, error, refreshing, query, setQuery, refresh } = useMovies();
 
   if (loading) return <LoadingScreen />;
 
-  if (error) return <ErrorScreen message={error} onRetry={() => fetchMovies(query)} />;
+  if (error) return <ErrorScreen message={error} onRetry={refresh} />;
 
   return (
     <View className="flex-1 bg-background">
@@ -86,7 +51,7 @@ export default function BrowseScreen() {
         contentContainerClassName="px-3 pb-5 pt-3"
         columnWrapperClassName="gap-3 mb-3"
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
+          <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={Colors.primary} />
         }
         ListEmptyComponent={
           <View className="items-center py-12">
