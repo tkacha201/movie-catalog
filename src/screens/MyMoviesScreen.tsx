@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useMovieStore, type SavedMovie } from '../store/movieStore';
 import { posterSize } from '../services/apiClient';
+import { Colors } from '../theme/colors';
 
 export default function MyMoviesScreen() {
   const navigation = useNavigation();
@@ -26,7 +27,7 @@ export default function MyMoviesScreen() {
           {/* Icon with glow */}
           <View className="mb-6">
             <View className="bg-card p-8 rounded-full">
-              <Ionicons name="film" size={64} color="#E50914" />
+              <Ionicons name="film" size={64} color={Colors.primary} />
             </View>
           </View>
           <Text className="text-white text-xl font-semibold mb-2">No Movies Yet</Text>
@@ -69,7 +70,7 @@ export default function MyMoviesScreen() {
                 />
               ) : (
                 <View className="w-24 h-36 bg-border items-center justify-center">
-                  <Ionicons name="film-outline" size={24} color="#AAAAAA" />
+                  <Ionicons name="film-outline" size={24} color={Colors.muted} />
                 </View>
               )}
               <View className="flex-1 py-3 px-4">
@@ -81,7 +82,7 @@ export default function MyMoviesScreen() {
                 </Text>
                 {item.rating > 0 && (
                   <View className="flex-row items-center gap-1 mt-2">
-                    <Ionicons name="star" size={14} color="#E50914" />
+                    <Ionicons name="star" size={14} color={Colors.primary} />
                     <Text className="text-white text-sm">{item.rating}/10</Text>
                   </View>
                 )}
@@ -100,14 +101,14 @@ export default function MyMoviesScreen() {
                       moviePoster: item.posterPath,
                     })}
                   >
-                    <Ionicons name="create-outline" size={16} color="#E50914" />
+                    <Ionicons name="create-outline" size={16} color={Colors.primary} />
                     <Text className="text-primary text-sm">Edit</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     className="flex-row items-center gap-1"
                     onPress={() => confirmDelete(item)}
                   >
-                    <Ionicons name="trash-outline" size={16} color="#AAAAAA" />
+                    <Ionicons name="trash-outline" size={16} color={Colors.muted} />
                     <Text className="text-muted text-sm">Remove</Text>
                   </TouchableOpacity>
                 </View>

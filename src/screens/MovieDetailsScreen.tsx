@@ -9,6 +9,7 @@ import { getMovieDetails, type TMDBMovieDetails } from '../services/movieService
 import { posterSize } from '../services/apiClient';
 import { useMovieStore } from '../store/movieStore';
 import type { RootStackScreenProps } from '../navigation/types';
+import { Colors } from '../theme/colors';
 
 export default function MovieDetailsScreen({ route }: RootStackScreenProps<'MovieDetails'>) {
   const { movieId } = route.params;
@@ -52,7 +53,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
   if (loading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#E50914" />
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
   }
@@ -80,7 +81,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
         onPress={() => navigation.goBack()}
         activeOpacity={0.7}
       >
-        <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+        <Ionicons name="arrow-back" size={24} color={Colors.white} />
       </TouchableOpacity>
 
       <ScrollView className="flex-1" bounces={false}>
@@ -97,7 +98,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
           </View>
         ) : (
           <View className="w-full h-64 bg-card items-center justify-center">
-            <Ionicons name="film-outline" size={64} color="#AAAAAA" />
+            <Ionicons name="film-outline" size={64} color={Colors.muted} />
           </View>
         )}
 
@@ -113,7 +114,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
                 <Text className="text-muted">{movie.runtime} min</Text>
               )}
               <View className="flex-row items-center gap-1.5">
-                <Ionicons name="star" size={18} color="#E50914" />
+                <Ionicons name="star" size={18} color={Colors.primary} />
                 <Text className="text-white font-semibold">
                   {movie.vote_average.toFixed(1)}/10
                 </Text>
@@ -124,7 +125,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
             {movie.genres.length > 0 && (
               <View className="flex-row flex-wrap gap-2 mb-6">
                 {movie.genres.map((g) => (
-                  <View key={g.id} className="rounded-full px-3 py-1 border border-primary" style={{ backgroundColor: 'rgba(229, 9, 20, 0.1)' }}>
+                  <View key={g.id} className="rounded-full px-3 py-1 border border-primary" style={{ backgroundColor: Colors.primaryAlpha }}>
                     <Text className="text-primary text-xs">{g.name}</Text>
                   </View>
                 ))}
@@ -146,7 +147,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
               <Ionicons
                 name={saved ? 'checkmark' : 'add'}
                 size={20}
-                color={saved ? '#E50914' : '#FFFFFF'}
+                color={saved ? Colors.primary : Colors.white}
               />
               <Text className={`text-base font-semibold ${saved ? 'text-white' : 'text-white'}`}>
                 {saved ? 'In My Movies' : 'Add to My Movies'}
@@ -164,7 +165,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
                 })
               }
             >
-              <Ionicons name="create-outline" size={20} color="#FFFFFF" />
+              <Ionicons name="create-outline" size={20} color={Colors.white} />
               <Text className="text-white text-base font-semibold">Write Review</Text>
             </TouchableOpacity>
           </View>

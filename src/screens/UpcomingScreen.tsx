@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { getUpcomingMovies, type TMDBMovie } from '../services/movieService';
 import { posterSize } from '../services/apiClient';
+import { Colors } from '../theme/colors';
 
 function daysUntil(dateStr: string): number {
   const release = new Date(dateStr);
@@ -54,7 +55,7 @@ export default function UpcomingScreen() {
   if (loading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#E50914" />
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
   }
@@ -80,7 +81,7 @@ export default function UpcomingScreen() {
         keyExtractor={(item) => String(item.id)}
         contentContainerClassName="px-5 pb-5"
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E50914" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
         }
         renderItem={({ item }) => {
           const days = daysUntil(item.release_date);
@@ -98,7 +99,7 @@ export default function UpcomingScreen() {
                 />
               ) : (
                 <View className="w-28 h-40 bg-border items-center justify-center">
-                  <Ionicons name="film-outline" size={24} color="#AAAAAA" />
+                  <Ionicons name="film-outline" size={24} color={Colors.muted} />
                 </View>
               )}
               <View className="flex-1 py-4 pr-4 pl-4">
@@ -109,13 +110,13 @@ export default function UpcomingScreen() {
 
                 {/* Date */}
                 <View className="flex-row items-center gap-2 mt-3">
-                  <Ionicons name="calendar-outline" size={16} color="#AAAAAA" />
+                  <Ionicons name="calendar-outline" size={16} color={Colors.muted} />
                   <Text className="text-muted text-sm">{formatDate(item.release_date)}</Text>
                 </View>
 
                 {/* Countdown pill */}
                 <View className="mt-auto pt-3">
-                  <View className="self-start rounded-full px-3 py-1.5 border border-primary" style={{ backgroundColor: 'rgba(229, 9, 20, 0.1)' }}>
+                  <View className="self-start rounded-full px-3 py-1.5 border border-primary" style={{ backgroundColor: Colors.primaryAlpha }}>
                     <Text className="text-primary text-xs font-semibold">
                       {days > 0
                         ? `Releases in ${days} days`

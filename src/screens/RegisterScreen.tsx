@@ -8,6 +8,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../store/authStore';
 import type { AuthStackScreenProps } from '../navigation/types';
+import { Colors } from '../theme/colors';
 
 interface RegisterForm {
   username: string;
@@ -46,7 +47,7 @@ export default function RegisterScreen() {
         {/* Logo */}
         <View className="items-center mb-12">
           <View className="bg-primary p-4 rounded-2xl mb-4">
-            <Ionicons name="film" size={48} color="#FFFFFF" />
+            <Ionicons name="film" size={48} color={Colors.white} />
           </View>
           <Text className="text-primary text-3xl font-medium">Create Account</Text>
           <Text className="text-muted text-sm mt-2">Join the community</Text>
@@ -64,7 +65,7 @@ export default function RegisterScreen() {
                   errors.username ? 'border-primary' : 'border-border'
                 }`}
                 placeholder="Username"
-                placeholderTextColor="#AAAAAA"
+                placeholderTextColor={Colors.muted}
                 autoCapitalize="none"
                 value={value}
                 onChangeText={onChange}
@@ -94,7 +95,7 @@ export default function RegisterScreen() {
                   errors.email ? 'border-primary' : 'border-border'
                 }`}
                 placeholder="Email"
-                placeholderTextColor="#AAAAAA"
+                placeholderTextColor={Colors.muted}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={value}
@@ -122,7 +123,7 @@ export default function RegisterScreen() {
                   errors.password ? 'border-primary' : 'border-border'
                 }`}
                 placeholder="Password"
-                placeholderTextColor="#AAAAAA"
+                placeholderTextColor={Colors.muted}
                 secureTextEntry
                 value={value}
                 onChangeText={onChange}
@@ -149,7 +150,7 @@ export default function RegisterScreen() {
                   errors.confirmPassword ? 'border-primary' : 'border-border'
                 }`}
                 placeholder="Confirm Password"
-                placeholderTextColor="#AAAAAA"
+                placeholderTextColor={Colors.muted}
                 secureTextEntry
                 value={value}
                 onChangeText={onChange}

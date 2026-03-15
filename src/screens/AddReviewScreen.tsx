@@ -11,6 +11,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { posterSize } from '../services/apiClient';
 import { useMovieStore } from '../store/movieStore';
 import type { RootStackScreenProps } from '../navigation/types';
+import { Colors } from '../theme/colors';
 
 interface ReviewForm {
   review: string;
@@ -121,7 +122,7 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
             />
           ) : (
             <View className="w-40 h-60 rounded-xl bg-card items-center justify-center">
-              <Ionicons name="film-outline" size={48} color="#AAAAAA" />
+              <Ionicons name="film-outline" size={48} color={Colors.muted} />
             </View>
           )}
           <Text className="text-white text-xl font-semibold mt-4">{movieTitle}</Text>
@@ -133,7 +134,7 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
             <View className="flex-row items-center justify-between mb-4">
               <Text className="text-white text-base font-semibold">Your Rating</Text>
               <View className="flex-row items-center gap-2">
-                <Ionicons name="star" size={20} color="#E50914" />
+                <Ionicons name="star" size={20} color={Colors.primary} />
                 <Text className="text-white text-xl font-bold">{rating}/10</Text>
               </View>
             </View>
@@ -143,9 +144,9 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
               step={1}
               value={rating}
               onValueChange={setRating}
-              minimumTrackTintColor="#E50914"
-              maximumTrackTintColor="#2A2A2A"
-              thumbTintColor="#E50914"
+              minimumTrackTintColor={Colors.primary}
+              maximumTrackTintColor={Colors.border}
+              thumbTintColor={Colors.primary}
             />
             <View className="flex-row justify-between mt-1">
               <Text className="text-muted text-xs">1</Text>
@@ -170,7 +171,7 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
                       errors.review ? 'border-primary' : 'border-border'
                     }`}
                     placeholder="Share your thoughts about this movie..."
-                    placeholderTextColor="#AAAAAA"
+                    placeholderTextColor={Colors.muted}
                     multiline
                     textAlignVertical="top"
                     value={value}
@@ -198,8 +199,8 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
             <Switch
               value={recommended}
               onValueChange={setRecommended}
-              trackColor={{ false: '#2A2A2A', true: '#E50914' }}
-              thumbColor="#FFFFFF"
+              trackColor={{ false: Colors.border, true: Colors.primary }}
+              thumbColor={Colors.white}
             />
           </View>
 
@@ -226,7 +227,7 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
                 onPress={showImageOptions}
                 activeOpacity={0.7}
               >
-                <Ionicons name="cloud-upload-outline" size={32} color="#AAAAAA" />
+                <Ionicons name="cloud-upload-outline" size={32} color={Colors.muted} />
                 <Text className="text-muted mt-2">Upload Image</Text>
               </TouchableOpacity>
             )}

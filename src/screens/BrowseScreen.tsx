@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { discoverMovies, searchMovies, type TMDBMovie } from '../services/movieService';
 import { posterSize } from '../services/apiClient';
+import { Colors } from '../theme/colors';
 
 export default function BrowseScreen() {
   const navigation = useNavigation();
@@ -50,7 +51,7 @@ export default function BrowseScreen() {
   if (loading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#E50914" />
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
   }
@@ -73,11 +74,11 @@ export default function BrowseScreen() {
 
         {/* Search Bar */}
         <View className="flex-row items-center bg-card border border-border rounded-xl px-4 h-12">
-          <Ionicons name="search" size={20} color="#AAAAAA" />
+          <Ionicons name="search" size={20} color={Colors.muted} />
           <TextInput
             className="flex-1 text-white text-base ml-3"
             placeholder="Search movies..."
-            placeholderTextColor="#AAAAAA"
+            placeholderTextColor={Colors.muted}
             value={query}
             onChangeText={setQuery}
             autoCapitalize="none"
@@ -85,7 +86,7 @@ export default function BrowseScreen() {
           />
           {query.length > 0 && (
             <TouchableOpacity onPress={() => setQuery('')}>
-              <Ionicons name="close-circle" size={20} color="#AAAAAA" />
+              <Ionicons name="close-circle" size={20} color={Colors.muted} />
             </TouchableOpacity>
           )}
         </View>
@@ -98,7 +99,7 @@ export default function BrowseScreen() {
         contentContainerClassName="px-3 pb-5 pt-3"
         columnWrapperClassName="gap-3 mb-3"
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E50914" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
         }
         ListEmptyComponent={
           <View className="items-center py-12">

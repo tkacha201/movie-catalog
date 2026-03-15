@@ -8,6 +8,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../store/authStore';
 import type { AuthStackScreenProps } from '../navigation/types';
+import { Colors } from '../theme/colors';
 
 interface LoginForm {
   email: string;
@@ -42,7 +43,7 @@ export default function LoginScreen() {
         {/* Logo */}
         <View className="items-center mb-12">
           <View className="bg-primary p-4 rounded-2xl mb-4">
-            <Ionicons name="film" size={48} color="#FFFFFF" />
+            <Ionicons name="film" size={48} color={Colors.white} />
           </View>
           <Text className="text-white text-3xl font-medium">Movie Catalog</Text>
           <Text className="text-muted text-sm mt-2">Your personal cinema</Text>
@@ -65,7 +66,7 @@ export default function LoginScreen() {
                   errors.email ? 'border-primary' : 'border-border'
                 }`}
                 placeholder="Email"
-                placeholderTextColor="#AAAAAA"
+                placeholderTextColor={Colors.muted}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={value}
@@ -87,7 +88,7 @@ export default function LoginScreen() {
               <TextInput
                 className="bg-card border border-border rounded-xl text-white text-base px-4 py-3.5"
                 placeholder="Password"
-                placeholderTextColor="#AAAAAA"
+                placeholderTextColor={Colors.muted}
                 secureTextEntry
                 value={value}
                 onChangeText={onChange}
