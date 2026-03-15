@@ -1,19 +1,17 @@
-import { useCallback } from 'react';
-import { useFetch } from './useFetch';
-import { getUpcomingMovies, type TMDBMovie } from '../services/movieService';
+import { useQuery } from '@tanstack/react-query';
+import { getUpcomingMovies } from '../services/movieService';
 
 export function useUpcoming() {
-  const fetcher = useCallback(() => getUpcomingMovies(), []);
-  const { data, loading, error, refreshing, refresh } = useFetch(
-    fetcher,
-    'Failed to load upcoming movies.',
-  );
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery({
+    queryKey: ['movies', 'upcoming'],
+    queryFn: () => getUpcomingMovies(),
+  });
 
   return {
     movies: data?.results ?? [],
-    loading,
-    error,
-    refreshing,
-    refresh,
+    loading: isLoading,
+    error: isError ? 'Failed to load upcoming movies.' : null,
+    refreshing: isRefetching,
+    refresh: refetch,
   };
 }

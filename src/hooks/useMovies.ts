@@ -1,47 +1,37 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { discoverMovies, searchMovies, type TMDBMovie } from '../services/movieService';
+import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { discoverMovies, searchMovies } from '../services/movieService';
 
 export function useMovies() {
-  const [movies, setMovies] = useState<TMDBMovie[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const queryClient = useQueryClient();
 
-  const fetchMovies = useCallback(async (searchQuery?: string) => {
-    try {
-      setError(null);
-      const data = searchQuery?.trim()
-        ? await searchMovies(searchQuery.trim())
-        : await discoverMovies();
-      setMovies(data.results);
-    } catch {
-      setError('Failed to load movies.');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
-
+  // Debounce search query
   useEffect(() => {
-    fetchMovies();
-  }, [fetchMovies]);
-
-  // Debounced search
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (!loading) fetchMovies(query);
-    }, 500);
+    const timeout = setTimeout(() => setDebouncedQuery(query), 500);
     return () => clearTimeout(timeout);
-  }, [query, fetchMovies, loading]);
+  }, [query]);
+
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery({
+    queryKey: ['movies', debouncedQuery],
+    queryFn: () =>
+      debouncedQuery.trim()
+        ? searchMovies(debouncedQuery.trim())
+        : discoverMovies(),
+  });
 
   const refresh = useCallback(() => {
-    setRefreshing(true);
-    fetchMovies(query);
-  }, [fetchMovies, query]);
+    queryClient.invalidateQueries({ queryKey: ['movies', debouncedQuery] });
+  }, [queryClient, debouncedQuery]);
 
-  return useMemo(
-    () => ({ movies, loading, error, refreshing, query, setQuery, refresh }),
-    [movies, loading, error, refreshing, query, refresh],
-  );
+  return {
+    movies: data?.results ?? [],
+    loading: isLoading,
+    error: isError ? 'Failed to load movies.' : null,
+    refreshing: isRefetching,
+    query,
+    setQuery,
+    refresh,
+  };
 }

@@ -1,13 +1,15 @@
-import { useCallback } from 'react';
-import { useFetch } from './useFetch';
-import { getMovieDetails, type TMDBMovieDetails } from '../services/movieService';
+import { useQuery } from '@tanstack/react-query';
+import { getMovieDetails } from '../services/movieService';
 
 export function useMovieDetails(movieId: number) {
-  const fetcher = useCallback(() => getMovieDetails(movieId), [movieId]);
-  const { data: movie, loading, error } = useFetch(
-    fetcher,
-    'Failed to load movie details.',
-  );
+  const { data: movie, isLoading, isError } = useQuery({
+    queryKey: ['movie', movieId],
+    queryFn: () => getMovieDetails(movieId),
+  });
 
-  return { movie, loading, error };
+  return {
+    movie: movie ?? null,
+    loading: isLoading,
+    error: isError ? 'Failed to load movie details.' : null,
+  };
 }
