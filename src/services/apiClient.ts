@@ -1,5 +1,7 @@
+import { Env } from '../config/env';
+
 const BASE_URL = 'https://api.themoviedb.org/3';
-const TOKEN = process.env.EXPO_PUBLIC_TMDB_API_TOKEN;
+const TOKEN = Env.TMDB_TOKEN;
 
 export const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
 export const posterSize = (size: 'w185' | 'w342' | 'w500' | 'w780' | 'original' = 'w500') =>
