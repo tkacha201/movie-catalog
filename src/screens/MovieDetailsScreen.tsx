@@ -77,7 +77,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
       {/* Back button */}
       <TouchableOpacity
         className="absolute z-10 bg-black/50 p-2 rounded-full"
-        style={{ top: insets.top + 8, left: 16 }}
+        style={localStyles.backButton(insets.top)}
         onPress={() => navigation.goBack()}
         activeOpacity={0.7}
       >
@@ -94,7 +94,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
               resizeMode="cover"
             />
             {/* Gradient overlay */}
-            <View className="absolute inset-x-0 bottom-0 h-40 bg-background" style={{ opacity: 0.9 }} />
+            <View className="absolute inset-x-0 bottom-0 h-40 bg-background" style={localStyles.gradientOverlay} />
           </View>
         ) : (
           <View className="w-full h-64 bg-card items-center justify-center">
@@ -103,7 +103,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
         )}
 
         {/* Info card */}
-        <View className="px-4 pb-10" style={{ marginTop: -64 }}>
+        <View className="px-4 pb-10" style={localStyles.infoCardOffset}>
           <View className="bg-card rounded-xl p-6">
             <Text className="text-white text-2xl font-bold mb-3">{movie.title}</Text>
 
@@ -125,7 +125,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
             {movie.genres.length > 0 && (
               <View className="flex-row flex-wrap gap-2 mb-6">
                 {movie.genres.map((g) => (
-                  <View key={g.id} className="rounded-full px-3 py-1 border border-primary" style={{ backgroundColor: Colors.primaryAlpha }}>
+                  <View key={g.id} className="rounded-full px-3 py-1 border border-primary" style={localStyles.genrePillBg}>
                     <Text className="text-primary text-xs">{g.name}</Text>
                   </View>
                 ))}
@@ -174,3 +174,10 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
     </View>
   );
 }
+
+const localStyles = {
+  backButton: (topInset: number) => ({ top: topInset + 8, left: 16 }),
+  gradientOverlay: { opacity: 0.9 },
+  infoCardOffset: { marginTop: -64 },
+  genrePillBg: { backgroundColor: Colors.primaryAlpha },
+} as const;

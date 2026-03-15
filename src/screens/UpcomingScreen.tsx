@@ -116,7 +116,7 @@ export default function UpcomingScreen() {
 
                 {/* Countdown pill */}
                 <View className="mt-auto pt-3">
-                  <View className="self-start rounded-full px-3 py-1.5 border border-primary" style={{ backgroundColor: Colors.primaryAlpha }}>
+                  <View className="self-start rounded-full px-3 py-1.5 border border-primary" style={localStyles.countdownPillBg}>
                     <Text className="text-primary text-xs font-semibold">
                       {days > 0
                         ? `Releases in ${days} days`
@@ -132,3 +132,7 @@ export default function UpcomingScreen() {
     </View>
   );
 }
+
+const localStyles = {
+  countdownPillBg: { backgroundColor: Colors.primaryAlpha },
+} as const;
