@@ -7,12 +7,12 @@ import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
-import * as ImagePicker from 'expo-image-picker';
 import { posterSize } from '../services/apiClient';
 import { useMovieStore } from '../store/movieStore';
 import type { RootStackScreenProps } from '../navigation/types';
 import { Colors } from '../theme/colors';
 import PrimaryButton from '../components/PrimaryButton';
+import { useImagePicker } from '../hooks/useImagePicker';
 
 interface ReviewForm {
   review: string;
@@ -29,56 +29,13 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
 
   const [rating, setRating] = useState(existingMovie?.rating ?? 5);
   const [recommended, setRecommended] = useState(existingMovie?.recommended ?? true);
-  const [imageUri, setImageUri] = useState<string | null>(existingMovie?.reviewImageUri ?? null);
+  const { imageUri, showOptions: showImageOptions, clearImage } = useImagePicker(
+    existingMovie?.reviewImageUri ?? null,
+  );
 
   const { control, handleSubmit, formState: { errors } } = useForm<ReviewForm>({
     defaultValues: { review: existingMovie?.review ?? '' },
   });
-
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission required', 'Please allow access to your photo library.');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setImageUri(result.assets[0].uri);
-    }
-  };
-
-  const takePhoto = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission required', 'Please allow access to your camera.');
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setImageUri(result.assets[0].uri);
-    }
-  };
-
-  const showImageOptions = () => {
-    Alert.alert('Add Image', 'Choose a source', [
-      { text: 'Camera', onPress: takePhoto },
-      { text: 'Photo Library', onPress: pickImage },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
-  };
 
   const onSubmit = (data: ReviewForm) => {
     if (!isMovieSaved(String(movieId))) {
@@ -217,7 +174,7 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
                 />
                 <TouchableOpacity
                   className="absolute top-2 right-2 bg-black/70 rounded-lg px-3 py-1"
-                  onPress={() => setImageUri(null)}
+                  onPress={clearImage}
                 >
                   <Text className="text-white text-sm">Remove</Text>
                 </TouchableOpacity>
