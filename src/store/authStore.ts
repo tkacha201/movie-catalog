@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 const AUTH_STORAGE_KEY = 'auth_user';
 
@@ -31,7 +31,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       username: email.split('@')[0],
       email,
     };
-    await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    await SecureStore.setItemAsync(AUTH_STORAGE_KEY, JSON.stringify(user));
     set({ user, isLoggedIn: true });
   },
 
@@ -42,18 +42,18 @@ export const useAuthStore = create<AuthState>((set) => ({
       username,
       email,
     };
-    await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    await SecureStore.setItemAsync(AUTH_STORAGE_KEY, JSON.stringify(user));
     set({ user, isLoggedIn: true });
   },
 
   logout: async () => {
-    await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
+    await SecureStore.deleteItemAsync(AUTH_STORAGE_KEY);
     set({ user: null, isLoggedIn: false });
   },
 
   restoreSession: async () => {
     try {
-      const stored = await AsyncStorage.getItem(AUTH_STORAGE_KEY);
+      const stored = await SecureStore.getItemAsync(AUTH_STORAGE_KEY);
       if (stored) {
         const user: User = JSON.parse(stored);
         set({ user, isLoggedIn: true, isLoading: false });
