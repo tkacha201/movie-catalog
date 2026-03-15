@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import RootNavigator from './src/navigation/RootNavigator';
 import { useAuthStore } from './src/store/authStore';
 import { Colors } from './src/theme/colors';
+import ErrorBoundary from './src/components/ErrorBoundary';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,11 +39,13 @@ export default function App() {
   }, [restoreSession]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <NavigationContainer theme={AppTheme}>
-        <StatusBar style="light" />
-        <RootNavigator />
-      </NavigationContainer>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <NavigationContainer theme={AppTheme}>
+          <StatusBar style="light" />
+          <RootNavigator />
+        </NavigationContainer>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
