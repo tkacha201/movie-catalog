@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, FlatList, Image, TouchableOpacity,
-  ActivityIndicator, RefreshControl,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getUpcomingMovies, type TMDBMovie } from '../services/movieService';
 import { posterSize } from '../services/apiClient';
 import { Colors } from '../theme/colors';
 import { useAppNavigation } from '../hooks/useAppNavigation';
+import LoadingScreen from '../components/LoadingScreen';
+import ErrorScreen from '../components/ErrorScreen';
 
 function daysUntil(dateStr: string): number {
   const release = new Date(dateStr);
@@ -52,24 +54,9 @@ export default function UpcomingScreen() {
     fetchUpcoming();
   };
 
-  if (loading) {
-    return (
-      <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
-  }
+  if (loading) return <LoadingScreen />;
 
-  if (error) {
-    return (
-      <View className="flex-1 bg-background items-center justify-center px-8">
-        <Text className="text-white text-base mb-4">{error}</Text>
-        <TouchableOpacity className="bg-primary rounded-xl py-3 px-6" onPress={fetchUpcoming}>
-          <Text className="text-white font-semibold">Retry</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  if (error) return <ErrorScreen message={error} onRetry={fetchUpcoming} />;
 
   return (
     <View className="flex-1 bg-background">

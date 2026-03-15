@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator,
+  View, Text, Image, ScrollView, TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +10,8 @@ import { posterSize } from '../services/apiClient';
 import { useMovieStore } from '../store/movieStore';
 import type { RootStackScreenProps } from '../navigation/types';
 import { Colors } from '../theme/colors';
+import LoadingScreen from '../components/LoadingScreen';
+import ErrorScreen from '../components/ErrorScreen';
 
 export default function MovieDetailsScreen({ route }: RootStackScreenProps<'MovieDetails'>) {
   const { movieId } = route.params;
@@ -50,21 +52,9 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
     }
   };
 
-  if (loading) {
-    return (
-      <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
-  }
+  if (loading) return <LoadingScreen />;
 
-  if (error || !movie) {
-    return (
-      <View className="flex-1 bg-background items-center justify-center px-8">
-        <Text className="text-white text-base">{error ?? 'Movie not found.'}</Text>
-      </View>
-    );
-  }
+  if (error || !movie) return <ErrorScreen message={error ?? 'Movie not found.'} />;
 
   const posterUri = movie.poster_path
     ? `${posterSize('w780')}${movie.poster_path}`

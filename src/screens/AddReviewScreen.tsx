@@ -12,6 +12,7 @@ import { posterSize } from '../services/apiClient';
 import { useMovieStore } from '../store/movieStore';
 import type { RootStackScreenProps } from '../navigation/types';
 import { Colors } from '../theme/colors';
+import PrimaryButton from '../components/PrimaryButton';
 
 interface ReviewForm {
   review: string;
@@ -234,13 +235,7 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
           </View>
 
           {/* Save button */}
-          <TouchableOpacity
-            className="bg-primary rounded-xl py-4 items-center"
-            onPress={handleSubmit(onSubmit)}
-            activeOpacity={0.8}
-          >
-            <Text className="text-white text-base font-semibold">Save Review</Text>
-          </TouchableOpacity>
+          <PrimaryButton title="Save Review" onPress={handleSubmit(onSubmit)} />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

@@ -1,14 +1,16 @@
 import React from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, Alert,
+  View, Text, TouchableOpacity, Alert,
   KeyboardAvoidingView, Platform, ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../store/authStore';
 import type { AuthStackScreenProps } from '../navigation/types';
 import { Colors } from '../theme/colors';
+import FormField from '../components/FormField';
+import PrimaryButton from '../components/PrimaryButton';
 
 interface RegisterForm {
   username: string;
@@ -54,31 +56,17 @@ export default function RegisterScreen() {
         </View>
 
         {/* Username */}
-        <Controller
+        <FormField
           control={control}
           name="username"
           rules={{ required: 'Username is required' }}
-          render={({ field: { onChange, value } }) => (
-            <View className="mb-4">
-              <TextInput
-                className={`bg-card border rounded-xl text-white text-base px-4 py-3.5 ${
-                  errors.username ? 'border-primary' : 'border-border'
-                }`}
-                placeholder="Username"
-                placeholderTextColor={Colors.muted}
-                autoCapitalize="none"
-                value={value}
-                onChangeText={onChange}
-              />
-              {errors.username && (
-                <Text className="text-primary text-xs mt-1">{errors.username.message}</Text>
-              )}
-            </View>
-          )}
+          error={errors.username}
+          placeholder="Username"
+          autoCapitalize="none"
         />
 
         {/* Email */}
-        <Controller
+        <FormField
           control={control}
           name="email"
           rules={{
@@ -88,87 +76,43 @@ export default function RegisterScreen() {
               message: 'Enter a valid email address',
             },
           }}
-          render={({ field: { onChange, value } }) => (
-            <View className="mb-4">
-              <TextInput
-                className={`bg-card border rounded-xl text-white text-base px-4 py-3.5 ${
-                  errors.email ? 'border-primary' : 'border-border'
-                }`}
-                placeholder="Email"
-                placeholderTextColor={Colors.muted}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={value}
-                onChangeText={onChange}
-              />
-              {errors.email && (
-                <Text className="text-primary text-xs mt-1">{errors.email.message}</Text>
-              )}
-            </View>
-          )}
+          error={errors.email}
+          placeholder="Email"
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
 
         {/* Password */}
-        <Controller
+        <FormField
           control={control}
           name="password"
           rules={{
             required: 'Password is required',
             minLength: { value: 6, message: 'Password must be at least 6 characters' },
           }}
-          render={({ field: { onChange, value } }) => (
-            <View className="mb-4">
-              <TextInput
-                className={`bg-card border rounded-xl text-white text-base px-4 py-3.5 ${
-                  errors.password ? 'border-primary' : 'border-border'
-                }`}
-                placeholder="Password"
-                placeholderTextColor={Colors.muted}
-                secureTextEntry
-                value={value}
-                onChangeText={onChange}
-              />
-              {errors.password && (
-                <Text className="text-primary text-xs mt-1">{errors.password.message}</Text>
-              )}
-            </View>
-          )}
+          error={errors.password}
+          placeholder="Password"
+          secureTextEntry
         />
 
         {/* Confirm Password */}
-        <Controller
+        <FormField
           control={control}
           name="confirmPassword"
           rules={{
             required: 'Please confirm your password',
-            validate: (val) => val === password || 'Passwords do not match',
+            validate: (val: string) => val === password || 'Passwords do not match',
           }}
-          render={({ field: { onChange, value } }) => (
-            <View className="mb-4">
-              <TextInput
-                className={`bg-card border rounded-xl text-white text-base px-4 py-3.5 ${
-                  errors.confirmPassword ? 'border-primary' : 'border-border'
-                }`}
-                placeholder="Confirm Password"
-                placeholderTextColor={Colors.muted}
-                secureTextEntry
-                value={value}
-                onChangeText={onChange}
-              />
-              {errors.confirmPassword && (
-                <Text className="text-primary text-xs mt-1">{errors.confirmPassword.message}</Text>
-              )}
-            </View>
-          )}
+          error={errors.confirmPassword}
+          placeholder="Confirm Password"
+          secureTextEntry
         />
 
-        <TouchableOpacity
-          className="bg-primary rounded-xl py-4 items-center mt-2 mb-6"
+        <PrimaryButton
+          title="Register"
           onPress={handleSubmit(onSubmit)}
-          activeOpacity={0.8}
-        >
-          <Text className="text-white text-base font-semibold">Register</Text>
-        </TouchableOpacity>
+          className="mt-2 mb-6"
+        />
 
         <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
           <Text className="text-muted text-sm text-center">

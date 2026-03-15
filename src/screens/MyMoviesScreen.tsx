@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMovieStore, type SavedMovie } from '../store/movieStore';
 import { posterSize } from '../services/apiClient';
 import { Colors } from '../theme/colors';
+import EmptyState from '../components/EmptyState';
 
 export default function MyMoviesScreen() {
   const navigation = useNavigation();
@@ -23,25 +24,13 @@ export default function MyMoviesScreen() {
         <Text className="text-white text-2xl font-bold px-5 pt-14 pb-4">
           My Movies
         </Text>
-        <View className="flex-1 items-center justify-center pb-20 px-6">
-          {/* Icon with glow */}
-          <View className="mb-6">
-            <View className="bg-card p-8 rounded-full">
-              <Ionicons name="film" size={64} color={Colors.primary} />
-            </View>
-          </View>
-          <Text className="text-white text-xl font-semibold mb-2">No Movies Yet</Text>
-          <Text className="text-muted text-center mb-8">
-            You haven't added any movies yet
-          </Text>
-          <TouchableOpacity
-            className="bg-primary rounded-xl py-3.5 px-8"
-            activeOpacity={0.8}
-            onPress={() => navigation.navigate('Main', { screen: 'Browse' })}
-          >
-            <Text className="text-white text-base font-semibold">Browse Movies</Text>
-          </TouchableOpacity>
-        </View>
+        <EmptyState
+          icon="film"
+          title="No Movies Yet"
+          subtitle="You haven't added any movies yet"
+          actionLabel="Browse Movies"
+          onAction={() => navigation.navigate('Main', { screen: 'Browse' })}
+        />
       </View>
     );
   }

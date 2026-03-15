@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, Image, TextInput,
-  ActivityIndicator, RefreshControl,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { discoverMovies, searchMovies, type TMDBMovie } from '../services/movieService';
 import { posterSize } from '../services/apiClient';
 import { Colors } from '../theme/colors';
 import { useAppNavigation } from '../hooks/useAppNavigation';
+import LoadingScreen from '../components/LoadingScreen';
+import ErrorScreen from '../components/ErrorScreen';
 
 export default function BrowseScreen() {
   const navigation = useAppNavigation();
@@ -48,24 +50,9 @@ export default function BrowseScreen() {
     fetchMovies(query);
   };
 
-  if (loading) {
-    return (
-      <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
-  }
+  if (loading) return <LoadingScreen />;
 
-  if (error) {
-    return (
-      <View className="flex-1 bg-background items-center justify-center px-8">
-        <Text className="text-white text-base mb-4">{error}</Text>
-        <TouchableOpacity className="bg-primary rounded-xl py-3 px-6" onPress={() => fetchMovies(query)}>
-          <Text className="text-white font-semibold">Retry</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  if (error) return <ErrorScreen message={error} onRetry={() => fetchMovies(query)} />;
 
   return (
     <View className="flex-1 bg-background">

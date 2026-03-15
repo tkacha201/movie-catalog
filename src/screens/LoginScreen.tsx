@@ -1,14 +1,16 @@
 import React from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, Alert,
+  View, Text, TouchableOpacity, Alert,
   KeyboardAvoidingView, Platform, ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../store/authStore';
 import type { AuthStackScreenProps } from '../navigation/types';
 import { Colors } from '../theme/colors';
+import FormField from '../components/FormField';
+import PrimaryButton from '../components/PrimaryButton';
 
 interface LoginForm {
   email: string;
@@ -50,7 +52,7 @@ export default function LoginScreen() {
         </View>
 
         {/* Email */}
-        <Controller
+        <FormField
           control={control}
           name="email"
           rules={{
@@ -59,51 +61,26 @@ export default function LoginScreen() {
               message: 'Enter a valid email address',
             },
           }}
-          render={({ field: { onChange, value } }) => (
-            <View className="mb-4">
-              <TextInput
-                className={`bg-card border rounded-xl text-white text-base px-4 py-3.5 ${
-                  errors.email ? 'border-primary' : 'border-border'
-                }`}
-                placeholder="Email"
-                placeholderTextColor={Colors.muted}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={value}
-                onChangeText={onChange}
-              />
-              {errors.email && (
-                <Text className="text-primary text-xs mt-1">{errors.email.message}</Text>
-              )}
-            </View>
-          )}
+          error={errors.email}
+          placeholder="Email"
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
 
         {/* Password */}
-        <Controller
+        <FormField
           control={control}
           name="password"
-          render={({ field: { onChange, value } }) => (
-            <View className="mb-4">
-              <TextInput
-                className="bg-card border border-border rounded-xl text-white text-base px-4 py-3.5"
-                placeholder="Password"
-                placeholderTextColor={Colors.muted}
-                secureTextEntry
-                value={value}
-                onChangeText={onChange}
-              />
-            </View>
-          )}
+          error={errors.password}
+          placeholder="Password"
+          secureTextEntry
         />
 
-        <TouchableOpacity
-          className="bg-primary rounded-xl py-4 items-center mt-2 mb-6"
+        <PrimaryButton
+          title="Login"
           onPress={handleSubmit(onSubmit)}
-          activeOpacity={0.8}
-        >
-          <Text className="text-white text-base font-semibold">Login</Text>
-        </TouchableOpacity>
+          className="mt-2 mb-6"
+        />
 
         <TouchableOpacity onPress={() => navigation.navigate('Register')} activeOpacity={0.7}>
           <Text className="text-muted text-sm text-center">
