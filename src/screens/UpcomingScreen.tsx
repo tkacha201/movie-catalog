@@ -3,11 +3,11 @@ import {
   View, Text, FlatList, Image, TouchableOpacity,
   ActivityIndicator, RefreshControl,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { getUpcomingMovies, type TMDBMovie } from '../services/movieService';
 import { posterSize } from '../services/apiClient';
 import { Colors } from '../theme/colors';
+import { useAppNavigation } from '../hooks/useAppNavigation';
 
 function daysUntil(dateStr: string): number {
   const release = new Date(dateStr);
@@ -24,7 +24,7 @@ function formatDate(dateStr: string): string {
 }
 
 export default function UpcomingScreen() {
-  const navigation = useNavigation();
+  const navigation = useAppNavigation();
   const [movies, setMovies] = useState<TMDBMovie[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);

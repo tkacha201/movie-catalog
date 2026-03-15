@@ -3,14 +3,14 @@ import {
   View, Text, FlatList, TouchableOpacity, Image, TextInput,
   ActivityIndicator, RefreshControl,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { discoverMovies, searchMovies, type TMDBMovie } from '../services/movieService';
 import { posterSize } from '../services/apiClient';
 import { Colors } from '../theme/colors';
+import { useAppNavigation } from '../hooks/useAppNavigation';
 
 export default function BrowseScreen() {
-  const navigation = useNavigation();
+  const navigation = useAppNavigation();
   const [movies, setMovies] = useState<TMDBMovie[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
