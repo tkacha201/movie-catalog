@@ -32,8 +32,8 @@ export default function RegisterScreen() {
   const onSubmit = async (data: RegisterForm) => {
     try {
       await register(data.username.trim(), data.email.trim(), data.password);
-    } catch {
-      Alert.alert('Error', 'Registration failed. Please try again.');
+    } catch (e: any) {
+      Alert.alert('Registration Failed', e?.message ?? 'Please try again.');
     }
   };
 

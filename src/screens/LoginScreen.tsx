@@ -27,9 +27,9 @@ export default function LoginScreen() {
 
   const onSubmit = async (data: LoginForm) => {
     try {
-      await login(data.email.trim() || 'guest@example.com', data.password || 'password');
-    } catch {
-      Alert.alert('Error', 'Login failed. Please try again.');
+      await login(data.email.trim(), data.password);
+    } catch (e: any) {
+      Alert.alert('Login Failed', e?.message ?? 'Please try again.');
     }
   };
 
@@ -56,6 +56,7 @@ export default function LoginScreen() {
           control={control}
           name="email"
           rules={{
+            required: 'Email is required',
             pattern: {
               value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
               message: 'Enter a valid email address',
@@ -71,6 +72,7 @@ export default function LoginScreen() {
         <FormField
           control={control}
           name="password"
+          rules={{ required: 'Password is required' }}
           error={errors.password}
           placeholder="Password"
           secureTextEntry
@@ -79,8 +81,14 @@ export default function LoginScreen() {
         <PrimaryButton
           title="Login"
           onPress={handleSubmit(onSubmit)}
-          className="mt-2 mb-6"
+          className="mt-2 mb-4"
         />
+
+        {/* Demo accounts hint */}
+        <View className="bg-card rounded-xl p-4 mb-6">
+          <Text className="text-muted text-xs text-center mb-1">Demo accounts (password: password)</Text>
+          <Text className="text-white text-xs text-center">alice@demo.com  ·  bob@demo.com  ·  charlie@demo.com</Text>
+        </View>
 
         <TouchableOpacity onPress={() => navigation.navigate('Register')} activeOpacity={0.7}>
           <Text className="text-muted text-sm text-center">
