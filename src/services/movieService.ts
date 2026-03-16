@@ -1,4 +1,5 @@
-import { tmdbFetch } from './apiClient';
+import { tmdbFetch, hasApiToken } from './apiClient';
+import { MOCK_MOVIES, MOCK_UPCOMING, getMockMovieDetails } from './mockData';
 
 export interface TMDBMovie {
   id: number;
@@ -24,7 +25,12 @@ interface TMDBPagedResponse<T> {
   total_results: number;
 }
 
+function mockPaged<T>(results: T[]): TMDBPagedResponse<T> {
+  return { page: 1, results, total_pages: 1, total_results: results.length };
+}
+
 export async function discoverMovies(page = 1): Promise<TMDBPagedResponse<TMDBMovie>> {
+  if (!hasApiToken) return mockPaged(MOCK_MOVIES);
   return tmdbFetch<TMDBPagedResponse<TMDBMovie>>('/discover/movie', {
     page: String(page),
     sort_by: 'popularity.desc',
@@ -32,10 +38,16 @@ export async function discoverMovies(page = 1): Promise<TMDBPagedResponse<TMDBMo
 }
 
 export async function getMovieDetails(id: number): Promise<TMDBMovieDetails> {
+  if (!hasApiToken) {
+    const mock = getMockMovieDetails(id);
+    if (mock) return mock;
+    throw new Error('Movie not found in mock data');
+  }
   return tmdbFetch<TMDBMovieDetails>(`/movie/${id}`);
 }
 
 export async function getUpcomingMovies(page = 1): Promise<TMDBPagedResponse<TMDBMovie>> {
+  if (!hasApiToken) return mockPaged(MOCK_UPCOMING);
   const today = new Date().toISOString().slice(0, 10);
   const endOfYear = `${new Date().getFullYear()}-12-31`;
   return tmdbFetch<TMDBPagedResponse<TMDBMovie>>('/discover/movie', {
@@ -48,6 +60,11 @@ export async function getUpcomingMovies(page = 1): Promise<TMDBPagedResponse<TMD
 }
 
 export async function searchMovies(query: string, page = 1): Promise<TMDBPagedResponse<TMDBMovie>> {
+  if (!hasApiToken) {
+    const q = query.toLowerCase();
+    const filtered = MOCK_MOVIES.filter((m) => m.title.toLowerCase().includes(q));
+    return mockPaged(filtered);
+  }
   return tmdbFetch<TMDBPagedResponse<TMDBMovie>>('/search/movie', {
     query,
     page: String(page),

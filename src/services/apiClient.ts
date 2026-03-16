@@ -3,6 +3,9 @@ import { Env } from '../config/env';
 const BASE_URL = 'https://api.themoviedb.org/3';
 const TOKEN = Env.TMDB_TOKEN;
 
+/** True when a real TMDB token is configured in .env */
+export const hasApiToken = TOKEN.length > 0;
+
 export const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
 export const posterSize = (size: 'w185' | 'w342' | 'w500' | 'w780' | 'original' = 'w500') =>
   `${IMAGE_BASE_URL}/${size}`;
