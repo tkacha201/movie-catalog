@@ -85,7 +85,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
             {/* Year & Rating */}
             <View className="flex-row items-center gap-4 mb-4">
               <Text className="text-muted">{movie.release_date?.slice(0, 4)}</Text>
-              {movie.runtime && (
+              {movie.runtime != null && movie.runtime > 0 && (
                 <Text className="text-muted">{movie.runtime} min</Text>
               )}
               <View className="flex-row items-center gap-1.5">
