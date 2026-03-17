@@ -7,17 +7,20 @@ export function useMovies() {
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const queryClient = useQueryClient();
 
-  // Debounce search query
+  // Debounce search query (2s after user stops typing)
   useEffect(() => {
-    const timeout = setTimeout(() => setDebouncedQuery(query), 500);
+    const timeout = setTimeout(() => setDebouncedQuery(query), 2000);
     return () => clearTimeout(timeout);
   }, [query]);
 
+  const searchTerm = debouncedQuery.trim();
+  const shouldSearch = searchTerm.length >= 2;
+
   const { data, isLoading, isError, isRefetching, isFetching, refetch } = useQuery({
-    queryKey: ['movies', debouncedQuery],
+    queryKey: ['movies', shouldSearch ? searchTerm : ''],
     queryFn: () =>
-      debouncedQuery.trim()
-        ? searchMovies(debouncedQuery.trim())
+      shouldSearch
+        ? searchMovies(searchTerm)
         : discoverMovies(),
     placeholderData: (prev) => prev,
   });
