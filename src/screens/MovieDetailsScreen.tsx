@@ -185,6 +185,8 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
                         movieId: movie.id,
                         movieTitle: movie.title,
                         moviePoster: movie.poster_path,
+                        movieReleaseDate: movie.release_date,
+                        movieOverview: movie.overview,
                       })
                     }
                   >
@@ -210,6 +212,8 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
                     movieId: movie.id,
                     movieTitle: movie.title,
                     moviePoster: movie.poster_path,
+                    movieReleaseDate: movie.release_date,
+                    movieOverview: movie.overview,
                   })
                 }
               >

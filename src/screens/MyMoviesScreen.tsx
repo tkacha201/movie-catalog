@@ -126,6 +126,8 @@ export default function MyMoviesScreen() {
                         movieId: Number(item.id),
                         movieTitle: item.title,
                         moviePoster: item.posterPath,
+                        movieReleaseDate: item.releaseDate,
+                        movieOverview: item.overview,
                       })}
                     >
                       <Ionicons name="create-outline" size={16} color={Colors.primary} />

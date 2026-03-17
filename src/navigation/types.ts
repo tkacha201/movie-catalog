@@ -18,7 +18,7 @@ export type RootStackParamList = {
   Auth: NavigatorScreenParams<AuthStackParamList>;
   Main: NavigatorScreenParams<MainTabsParamList>;
   MovieDetails: { movieId: number };
-  AddReview: { movieId: number; movieTitle: string; moviePoster: string | null };
+  AddReview: { movieId: number; movieTitle: string; moviePoster: string | null; movieReleaseDate: string; movieOverview: string };
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =

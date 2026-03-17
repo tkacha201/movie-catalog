@@ -19,7 +19,7 @@ interface ReviewForm {
 }
 
 export default function AddReviewScreen({ route }: RootStackScreenProps<'AddReview'>) {
-  const { movieId, movieTitle, moviePoster } = route.params;
+  const { movieId, movieTitle, moviePoster, movieReleaseDate, movieOverview } = route.params;
   const navigation = useNavigation();
   const { updateMovie, addMovie, isMovieSaved } = useMovieStore();
 
@@ -43,8 +43,8 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
         id: String(movieId),
         title: movieTitle,
         posterPath: moviePoster,
-        releaseDate: '',
-        overview: '',
+        releaseDate: movieReleaseDate,
+        overview: movieOverview,
       });
     }
 
