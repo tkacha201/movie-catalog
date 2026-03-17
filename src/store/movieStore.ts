@@ -43,7 +43,9 @@ async function loadMovies(userId: string): Promise<SavedMovie[]> {
     const raw = await AsyncStorage.getItem(storageKey(userId));
     if (raw) {
       const parsed = JSON.parse(raw);
-      return parsed.state?.savedMovies ?? [];
+      const movies: SavedMovie[] = parsed.state?.savedMovies ?? [];
+      // Filter out movies with invalid/removed statuses (e.g. old 'watching')
+      return movies.filter((m) => m.status === 'watched' || m.status === 'wishlist');
     }
   } catch { /* ignore */ }
   return [];

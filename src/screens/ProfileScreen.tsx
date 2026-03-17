@@ -10,7 +10,6 @@ export default function ProfileScreen() {
   const savedMovies = useMovieStore((s) => s.savedMovies);
 
   const watched = savedMovies.filter((m) => m.status === 'watched');
-  const totalSaved = savedMovies.length;
   const wishlist = savedMovies.filter((m) => m.status === 'wishlist');
   const reviewed = savedMovies.filter((m) => m.review.length > 0);
   const rated = savedMovies.filter((m) => m.rating > 0);
@@ -55,10 +54,10 @@ export default function ProfileScreen() {
           </View>
           <View className="flex-1 bg-card rounded-xl p-4">
             <View className="flex-row items-center justify-between mb-3">
-              <Ionicons name="film" size={20} color={Colors.primary} />
-              <Text className="text-primary text-2xl font-semibold">{totalSaved}</Text>
+              <Ionicons name="chatbubble" size={20} color={Colors.primary} />
+              <Text className="text-primary text-2xl font-semibold">{reviewed.length}</Text>
             </View>
-            <Text className="text-muted text-sm">Total Saved</Text>
+            <Text className="text-muted text-sm">Reviews</Text>
           </View>
         </View>
         <View className="flex-row gap-3 mb-6">
@@ -71,31 +70,10 @@ export default function ProfileScreen() {
           </View>
           <View className="flex-1 bg-card rounded-xl p-4">
             <View className="flex-row items-center justify-between mb-3">
-              <Ionicons name="chatbubble" size={20} color={Colors.primary} />
-              <Text className="text-primary text-2xl font-semibold">{reviewed.length}</Text>
+              <Ionicons name="star" size={20} color={Colors.primary} />
+              <Text className="text-primary text-2xl font-semibold">{avgRating}</Text>
             </View>
-            <Text className="text-muted text-sm">Reviews</Text>
-          </View>
-        </View>
-
-        {/* Rating Stats */}
-        <View className="bg-card rounded-xl p-6 mb-6">
-          <View className="flex-row items-center gap-2 mb-4">
-            <Ionicons name="star" size={20} color={Colors.primary} />
-            <Text className="text-white font-semibold">Rating Stats</Text>
-          </View>
-          <View className="gap-4">
-            <View className="flex-row items-center justify-between">
-              <Text className="text-muted">Average Rating</Text>
-              <View className="flex-row items-center gap-1.5">
-                <Ionicons name="star" size={14} color={Colors.primary} />
-                <Text className="text-white font-semibold">{avgRating}/10</Text>
-              </View>
-            </View>
-            <View className="flex-row items-center justify-between">
-              <Text className="text-muted">Total Movies</Text>
-              <Text className="text-white font-semibold">{savedMovies.length}</Text>
-            </View>
+            <Text className="text-muted text-sm">Avg Rating</Text>
           </View>
         </View>
 
