@@ -135,7 +135,6 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
             <View className="flex-row gap-2 mb-4">
               {([
                 { key: 'watched', icon: 'checkmark-circle', label: 'Watched' },
-                { key: 'watching', icon: 'eye', label: 'Watching' },
                 { key: 'wishlist', icon: 'bookmark', label: 'Wishlist' },
               ] as const).map(({ key, icon, label }) => {
                 const isActive = currentStatus === key;

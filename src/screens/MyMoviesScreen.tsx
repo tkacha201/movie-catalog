@@ -2,29 +2,33 @@ import React, { useState } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { useMovieStore, type SavedMovie, type MovieStatus } from '../store/movieStore';
+import { useMovieStore, type SavedMovie } from '../store/movieStore';
 import { posterSize } from '../services/apiClient';
 import { Colors } from '../theme/colors';
 import EmptyState from '../components/EmptyState';
 
-const TABS: { key: MovieStatus; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+type TabKey = 'watched' | 'wishlist' | 'reviews';
+
+const TABS: { key: TabKey; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
   { key: 'watched', label: 'Watched', icon: 'checkmark-circle' },
-  { key: 'watching', label: 'Watching', icon: 'eye' },
   { key: 'wishlist', label: 'Wishlist', icon: 'bookmark' },
+  { key: 'reviews', label: 'Reviews', icon: 'chatbubble' },
 ];
 
-const EMPTY_MESSAGES: Record<MovieStatus, { title: string; subtitle: string; icon: keyof typeof Ionicons.glyphMap }> = {
+const EMPTY_MESSAGES: Record<TabKey, { title: string; subtitle: string; icon: keyof typeof Ionicons.glyphMap }> = {
   watched: { title: 'No Watched Movies', subtitle: "Movies you've finished will appear here", icon: 'checkmark-circle-outline' },
-  watching: { title: 'Not Watching Anything', subtitle: "Track shows you're currently following", icon: 'eye-outline' },
   wishlist: { title: 'Empty Wishlist', subtitle: 'Save movies you want to watch later', icon: 'bookmark-outline' },
+  reviews: { title: 'No Reviews Yet', subtitle: 'Rate and review movies to see them here', icon: 'chatbubble-outline' },
 };
 
 export default function MyMoviesScreen() {
   const navigation = useNavigation();
   const { savedMovies, deleteMovie } = useMovieStore();
-  const [activeTab, setActiveTab] = useState<MovieStatus>('watched');
+  const [activeTab, setActiveTab] = useState<TabKey>('watched');
 
-  const filteredMovies = savedMovies.filter((m) => m.status === activeTab);
+  const filteredMovies = activeTab === 'reviews'
+    ? savedMovies.filter((m) => m.review.length > 0)
+    : savedMovies.filter((m) => m.status === activeTab);
 
   const confirmDelete = (movie: SavedMovie) => {
     Alert.alert('Remove Movie', `Remove "${movie.title}" from your list?`, [
@@ -45,7 +49,9 @@ export default function MyMoviesScreen() {
       <View className="flex-row px-5 gap-2 mb-4">
         {TABS.map((tab) => {
           const isActive = activeTab === tab.key;
-          const count = savedMovies.filter((m) => m.status === tab.key).length;
+          const count = tab.key === 'reviews'
+            ? savedMovies.filter((m) => m.review.length > 0).length
+            : savedMovies.filter((m) => m.status === tab.key).length;
           return (
             <TouchableOpacity
               key={tab.key}
@@ -90,6 +96,7 @@ export default function MyMoviesScreen() {
             return (
               <TouchableOpacity
                 className="flex-1 bg-card rounded-xl overflow-hidden"
+                style={{ maxWidth: '49%' }}
                 activeOpacity={0.7}
                 onPress={() => navigation.navigate('MovieDetails', { movieId: Number(item.id) })}
               >
@@ -112,7 +119,7 @@ export default function MyMoviesScreen() {
                       color={Colors.white}
                     />
                   </View>
-                  {activeTab === 'watched' && item.rating > 0 && (
+                  {(activeTab === 'watched' || activeTab === 'reviews') && item.rating > 0 && (
                     <View className="absolute bottom-2 left-2 bg-black/70 rounded-lg px-2 py-1 flex-row items-center gap-1">
                       <Ionicons name="star" size={12} color={Colors.primary} />
                       <Text className="text-white text-xs font-semibold">{item.rating}/10</Text>

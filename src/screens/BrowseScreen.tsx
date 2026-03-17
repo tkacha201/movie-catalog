@@ -61,6 +61,7 @@ export default function BrowseScreen() {
         renderItem={({ item }) => (
           <TouchableOpacity
             className="flex-1 bg-card rounded-xl overflow-hidden border border-border"
+            style={{ maxWidth: '49%' }}
             activeOpacity={0.7}
             onPress={() => navigation.navigate('MovieDetails', { movieId: item.id })}
           >

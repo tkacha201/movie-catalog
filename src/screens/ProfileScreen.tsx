@@ -10,7 +10,7 @@ export default function ProfileScreen() {
   const savedMovies = useMovieStore((s) => s.savedMovies);
 
   const watched = savedMovies.filter((m) => m.status === 'watched');
-  const watching = savedMovies.filter((m) => m.status === 'watching');
+  const totalSaved = savedMovies.length;
   const wishlist = savedMovies.filter((m) => m.status === 'wishlist');
   const reviewed = savedMovies.filter((m) => m.review.length > 0);
   const rated = savedMovies.filter((m) => m.rating > 0);
@@ -55,10 +55,10 @@ export default function ProfileScreen() {
           </View>
           <View className="flex-1 bg-card rounded-xl p-4">
             <View className="flex-row items-center justify-between mb-3">
-              <Ionicons name="eye" size={20} color={Colors.primary} />
-              <Text className="text-primary text-2xl font-semibold">{watching.length}</Text>
+              <Ionicons name="film" size={20} color={Colors.primary} />
+              <Text className="text-primary text-2xl font-semibold">{totalSaved}</Text>
             </View>
-            <Text className="text-muted text-sm">Watching</Text>
+            <Text className="text-muted text-sm">Total Saved</Text>
           </View>
         </View>
         <View className="flex-row gap-3 mb-6">

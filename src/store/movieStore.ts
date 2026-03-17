@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type MovieStatus = 'watched' | 'watching' | 'wishlist';
+export type MovieStatus = 'watched' | 'wishlist';
 
 export interface SavedMovie {
   id: string;
