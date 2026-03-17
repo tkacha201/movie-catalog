@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../store/authStore';
 import { useMovieStore } from '../store/movieStore';
@@ -7,11 +7,20 @@ import { Colors } from '../theme/colors';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuthStore();
-  const savedCount = useMovieStore((s) => s.savedMovies.length);
+  const savedMovies = useMovieStore((s) => s.savedMovies);
+
+  const watched = savedMovies.filter((m) => m.status === 'watched');
+  const watching = savedMovies.filter((m) => m.status === 'watching');
+  const wishlist = savedMovies.filter((m) => m.status === 'wishlist');
+  const reviewed = savedMovies.filter((m) => m.review.length > 0);
+  const rated = savedMovies.filter((m) => m.rating > 0);
+  const avgRating = rated.length > 0
+    ? (rated.reduce((sum, m) => sum + m.rating, 0) / rated.length).toFixed(1)
+    : '—';
 
   return (
     <View className="flex-1 bg-background">
-      <View className="px-4 pt-14 pb-6">
+      <ScrollView className="flex-1" contentContainerClassName="px-4 pt-14 pb-10">
         <Text className="text-white text-2xl font-bold mb-8">Profile</Text>
 
         {/* Profile Card */}
@@ -23,6 +32,7 @@ export default function ProfileScreen() {
             <Text className="text-white text-xl font-semibold">
               {user?.username ?? 'Guest'}
             </Text>
+            <Text className="text-muted text-sm mt-1">Member since Mar 2026</Text>
           </View>
 
           <View className="bg-background rounded-xl p-3 flex-row items-center gap-3">
@@ -34,14 +44,58 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Saved Movies Card */}
+        {/* Quick Stats Grid */}
+        <View className="flex-row gap-3 mb-3">
+          <View className="flex-1 bg-card rounded-xl p-4">
+            <View className="flex-row items-center justify-between mb-3">
+              <Ionicons name="checkmark-circle" size={20} color={Colors.primary} />
+              <Text className="text-primary text-2xl font-semibold">{watched.length}</Text>
+            </View>
+            <Text className="text-muted text-sm">Watched</Text>
+          </View>
+          <View className="flex-1 bg-card rounded-xl p-4">
+            <View className="flex-row items-center justify-between mb-3">
+              <Ionicons name="eye" size={20} color={Colors.primary} />
+              <Text className="text-primary text-2xl font-semibold">{watching.length}</Text>
+            </View>
+            <Text className="text-muted text-sm">Watching</Text>
+          </View>
+        </View>
+        <View className="flex-row gap-3 mb-6">
+          <View className="flex-1 bg-card rounded-xl p-4">
+            <View className="flex-row items-center justify-between mb-3">
+              <Ionicons name="bookmark" size={20} color={Colors.primary} />
+              <Text className="text-primary text-2xl font-semibold">{wishlist.length}</Text>
+            </View>
+            <Text className="text-muted text-sm">Wishlist</Text>
+          </View>
+          <View className="flex-1 bg-card rounded-xl p-4">
+            <View className="flex-row items-center justify-between mb-3">
+              <Ionicons name="chatbubble" size={20} color={Colors.primary} />
+              <Text className="text-primary text-2xl font-semibold">{reviewed.length}</Text>
+            </View>
+            <Text className="text-muted text-sm">Reviews</Text>
+          </View>
+        </View>
+
+        {/* Rating Stats */}
         <View className="bg-card rounded-xl p-6 mb-6">
-          <Text className="text-white text-base font-semibold mb-3">Your Movies</Text>
-          <View className="flex-row items-center gap-3">
-            <Ionicons name="film" size={20} color={Colors.primary} />
-            <Text className="text-white text-base">
-              {savedCount} {savedCount === 1 ? 'movie' : 'movies'} saved
-            </Text>
+          <View className="flex-row items-center gap-2 mb-4">
+            <Ionicons name="star" size={20} color={Colors.primary} />
+            <Text className="text-white font-semibold">Rating Stats</Text>
+          </View>
+          <View className="gap-4">
+            <View className="flex-row items-center justify-between">
+              <Text className="text-muted">Average Rating</Text>
+              <View className="flex-row items-center gap-1.5">
+                <Ionicons name="star" size={14} color={Colors.primary} />
+                <Text className="text-white font-semibold">{avgRating}/10</Text>
+              </View>
+            </View>
+            <View className="flex-row items-center justify-between">
+              <Text className="text-muted">Total Movies</Text>
+              <Text className="text-white font-semibold">{savedMovies.length}</Text>
+            </View>
           </View>
         </View>
 
@@ -54,7 +108,7 @@ export default function ProfileScreen() {
           <Ionicons name="log-out-outline" size={20} color={Colors.primary} />
           <Text className="text-primary text-base font-semibold">Logout</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 }
