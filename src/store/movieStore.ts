@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export type MovieStatus = 'watched' | 'watching' | 'wishlist';
 
 export interface SavedMovie {
   id: string;
@@ -13,20 +14,24 @@ export interface SavedMovie {
   reviewImageUri: string | null;
   recommended: boolean;
   savedAt: number;
+  status: MovieStatus;
 }
 
 interface MovieState {
-  /** Current user ID — drives per-user storage key */
   _userId: string | null;
   savedMovies: SavedMovie[];
-  /** Call after login to load movies for this user */
   loadForUser: (userId: string) => Promise<void>;
-  /** Call on logout to clear in-memory state */
   clearForLogout: () => void;
-  addMovie: (movie: Omit<SavedMovie, 'rating' | 'review' | 'reviewImageUri' | 'recommended' | 'savedAt'>) => void;
-  updateMovie: (id: string, updates: Partial<Pick<SavedMovie, 'rating' | 'review' | 'reviewImageUri' | 'recommended'>>) => void;
+  /** Add or update a movie's status. Pass null to remove. */
+  setMovieStatus: (
+    movie: { id: string; title: string; posterPath: string | null; releaseDate: string; overview: string },
+    status: MovieStatus | null,
+  ) => void;
+  addMovie: (movie: Omit<SavedMovie, 'rating' | 'review' | 'reviewImageUri' | 'recommended' | 'savedAt' | 'status'>) => void;
+  updateMovie: (id: string, updates: Partial<Pick<SavedMovie, 'rating' | 'review' | 'reviewImageUri' | 'recommended' | 'status'>>) => void;
   deleteMovie: (id: string) => void;
   isMovieSaved: (id: string) => boolean;
+  getMovieStatus: (id: string) => MovieStatus | null;
 }
 
 function storageKey(userId: string) {
@@ -65,6 +70,36 @@ export const useMovieStore = create<MovieState>()((set, get) => ({
     set({ _userId: null, savedMovies: [] });
   },
 
+  setMovieStatus: (movie, status) => {
+    const { savedMovies, _userId } = get();
+    const existing = savedMovies.find((m) => m.id === movie.id);
+
+    let updated: SavedMovie[];
+    if (status === null) {
+      // Remove
+      updated = savedMovies.filter((m) => m.id !== movie.id);
+    } else if (existing) {
+      // Update status
+      updated = savedMovies.map((m) =>
+        m.id === movie.id ? { ...m, status } : m
+      );
+    } else {
+      // Add new
+      const newMovie: SavedMovie = {
+        ...movie,
+        rating: 0,
+        review: '',
+        reviewImageUri: null,
+        recommended: false,
+        savedAt: Date.now(),
+        status,
+      };
+      updated = [newMovie, ...savedMovies];
+    }
+    set({ savedMovies: updated });
+    persistMovies(_userId, updated);
+  },
+
   addMovie: (movie) => {
     const { savedMovies, _userId } = get();
     const exists = savedMovies.some((m) => m.id === movie.id);
@@ -77,6 +112,7 @@ export const useMovieStore = create<MovieState>()((set, get) => ({
       reviewImageUri: null,
       recommended: false,
       savedAt: Date.now(),
+      status: 'watched',
     };
 
     const updated = [newMovie, ...savedMovies];
@@ -102,5 +138,9 @@ export const useMovieStore = create<MovieState>()((set, get) => ({
 
   isMovieSaved: (id) => {
     return get().savedMovies.some((m) => m.id === id);
+  },
+
+  getMovieStatus: (id) => {
+    return get().savedMovies.find((m) => m.id === id)?.status ?? null;
   },
 }));

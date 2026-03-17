@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { posterSize } from '../services/apiClient';
-import { useMovieStore } from '../store/movieStore';
+import { useMovieStore, type MovieStatus } from '../store/movieStore';
 import type { RootStackScreenProps } from '../navigation/types';
 import { Colors } from '../theme/colors';
 import { useMovieDetails } from '../hooks/useMovieDetails';
@@ -19,26 +19,24 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
   const insets = useSafeAreaInsets();
   const { movie, loading, error } = useMovieDetails(movieId);
 
-  const { addMovie, deleteMovie } = useMovieStore();
+  const { addMovie, deleteMovie, setMovieStatus } = useMovieStore();
   const saved = useMovieStore((s) => s.isMovieSaved(String(movieId)));
   const savedMovie = useMovieStore((s) =>
     s.savedMovies.find((m) => m.id === String(movieId))
   );
+  const currentStatus = savedMovie?.status ?? null;
   const hasReview = Boolean(savedMovie?.review);
 
-  const toggleSaved = () => {
+  const handleStatusToggle = (status: MovieStatus) => {
     if (!movie) return;
-    if (saved) {
-      deleteMovie(String(movie.id));
-    } else {
-      addMovie({
-        id: String(movie.id),
-        title: movie.title,
-        posterPath: movie.poster_path,
-        releaseDate: movie.release_date,
-        overview: movie.overview,
-      });
-    }
+    const movieInfo = {
+      id: String(movie.id),
+      title: movie.title,
+      posterPath: movie.poster_path,
+      releaseDate: movie.release_date,
+      overview: movie.overview,
+    };
+    setMovieStatus(movieInfo, currentStatus === status ? null : status);
   };
 
   const confirmDeleteReview = () => {
@@ -130,23 +128,36 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
             <Text className="text-white font-semibold mb-2">Synopsis</Text>
             <Text className="text-muted text-[15px] leading-6 mb-6">{movie.overview}</Text>
 
-            {/* Action buttons */}
-            <TouchableOpacity
-              className={`rounded-xl py-4 flex-row items-center justify-center gap-2 mb-3 ${
-                saved ? 'bg-border border border-primary' : 'bg-primary'
-              }`}
-              onPress={toggleSaved}
-              activeOpacity={0.8}
-            >
-              <Ionicons
-                name={saved ? 'checkmark' : 'add'}
-                size={20}
-                color={saved ? Colors.primary : Colors.white}
-              />
-              <Text className={`text-base font-semibold ${saved ? 'text-white' : 'text-white'}`}>
-                {saved ? 'In My Movies' : 'Add to My Movies'}
-              </Text>
-            </TouchableOpacity>
+            {/* Status buttons */}
+            <Text className="text-muted text-sm mb-2">Add to list:</Text>
+            <View className="flex-row gap-2 mb-4">
+              {([
+                { key: 'watched', icon: 'checkmark-circle', label: 'Watched' },
+                { key: 'watching', icon: 'eye', label: 'Watching' },
+                { key: 'wishlist', icon: 'bookmark', label: 'Wishlist' },
+              ] as const).map(({ key, icon, label }) => {
+                const isActive = currentStatus === key;
+                return (
+                  <TouchableOpacity
+                    key={key}
+                    className={`flex-1 rounded-xl py-3 items-center gap-1 ${
+                      isActive ? 'bg-primary' : 'bg-card border border-border'
+                    }`}
+                    onPress={() => handleStatusToggle(key)}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons
+                      name={isActive ? icon : (`${icon}-outline` as any)}
+                      size={20}
+                      color={isActive ? Colors.white : Colors.muted}
+                    />
+                    <Text className={`text-xs font-semibold ${isActive ? 'text-white' : 'text-muted'}`}>
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
 
             {hasReview ? (
               <>

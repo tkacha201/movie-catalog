@@ -53,6 +53,7 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
       review: data.review,
       reviewImageUri: imageUri,
       recommended,
+      status: 'watched',
     });
 
     Alert.alert('Saved', 'Your review has been saved.', [
