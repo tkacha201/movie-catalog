@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../store/authStore';
 import { useMovieStore } from '../store/movieStore';
@@ -102,7 +102,10 @@ export default function ProfileScreen() {
         {/* Logout */}
         <TouchableOpacity
           className="bg-card rounded-xl py-4 flex-row items-center justify-center gap-2 border border-primary"
-          onPress={logout}
+          onPress={() => Alert.alert('Logout', 'Are you sure you want to logout?', [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Logout', style: 'destructive', onPress: logout },
+          ])}
           activeOpacity={0.8}
         >
           <Ionicons name="log-out-outline" size={20} color={Colors.primary} />
