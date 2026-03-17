@@ -65,11 +65,13 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
     <KeyboardAvoidingView
       className="flex-1 bg-background"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
     >
       <ScrollView
         className="flex-1"
         contentContainerClassName="pb-10"
         keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets
       >
         {/* Movie preview */}
         <View className="items-center py-6">
