@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, Image, TextInput, TouchableOpacity, Alert, Switch,
-  KeyboardAvoidingView, Platform, ScrollView,
+  ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
@@ -62,17 +62,12 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
   };
 
   return (
-    <KeyboardAvoidingView
+    <ScrollView
       className="flex-1 bg-background"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+      contentContainerClassName="pb-10"
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets
     >
-      <ScrollView
-        className="flex-1"
-        contentContainerClassName="pb-10"
-        keyboardShouldPersistTaps="handled"
-        automaticallyAdjustKeyboardInsets
-      >
         {/* Movie preview */}
         <View className="items-center py-6">
           {moviePoster ? (
@@ -197,7 +192,6 @@ export default function AddReviewScreen({ route }: RootStackScreenProps<'AddRevi
           {/* Save button */}
           <PrimaryButton title="Save Review" onPress={handleSubmit(onSubmit)} />
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    </ScrollView>
   );
 }
