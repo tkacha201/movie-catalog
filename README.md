@@ -2,7 +2,7 @@
 
 ## APK Download
 
-> **[Download APK](TODO_ADD_APK_LINK_HERE)**
+> **[Download APK](https://expo.dev/artifacts/eas/t5QhVaSpCRpa6EGBSZhG8H.apk)**
 
 ---
 
