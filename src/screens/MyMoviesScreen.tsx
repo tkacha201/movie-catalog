@@ -149,6 +149,7 @@ export default function MyMoviesScreen() {
       ) : (
         /* Watching / Wishlist — 2-column grid */
         <FlatList
+          key={activeTab}
           data={filteredMovies}
           keyExtractor={(item) => item.id}
           numColumns={2}
