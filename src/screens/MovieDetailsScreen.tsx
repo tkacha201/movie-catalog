@@ -10,6 +10,7 @@ import { useMovieStore, type MovieStatus } from '../store/movieStore';
 import type { RootStackScreenProps } from '../navigation/types';
 import { Colors } from '../theme/colors';
 import { useMovieDetails } from '../hooks/useMovieDetails';
+import { useOtherReviews } from '../hooks/useOtherReviews';
 import LoadingScreen from '../components/LoadingScreen';
 import ErrorScreen from '../components/ErrorScreen';
 
@@ -26,6 +27,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
   );
   const currentStatus = savedMovie?.status ?? null;
   const hasReview = Boolean(savedMovie?.review);
+  const { reviews: otherReviews } = useOtherReviews(String(movieId));
 
   const handleStatusToggle = (status: MovieStatus) => {
     if (!movie) return;
@@ -214,6 +216,32 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
                 <Ionicons name="create-outline" size={20} color={Colors.white} />
                 <Text className="text-white text-base font-semibold">Write Review</Text>
               </TouchableOpacity>
+            )}
+
+            {/* Community Reviews */}
+            {otherReviews.length > 0 && (
+              <View className="mt-6">
+                <Text className="text-white font-semibold mb-3">
+                  Community Reviews ({otherReviews.length})
+                </Text>
+                {otherReviews.map((r) => (
+                  <View key={r.userId} className="bg-background rounded-xl p-4 mb-2">
+                    <View className="flex-row items-center gap-3 mb-2">
+                      <View className="bg-primary w-8 h-8 rounded-full items-center justify-center">
+                        <Text className="text-white text-xs font-bold">
+                          {r.username.charAt(0).toUpperCase()}
+                        </Text>
+                      </View>
+                      <Text className="text-white font-semibold flex-1">{r.username}</Text>
+                      <View className="flex-row items-center gap-1">
+                        <Ionicons name="star" size={12} color={Colors.primary} />
+                        <Text className="text-white text-sm">{r.rating}/10</Text>
+                      </View>
+                    </View>
+                    <Text className="text-muted text-sm leading-5">{r.review}</Text>
+                  </View>
+                ))}
+              </View>
             )}
           </View>
         </View>

@@ -40,6 +40,12 @@ function getAllAccounts(custom: StoredAccount[]): StoredAccount[] {
   return [...DEFAULT_ACCOUNTS, ...custom];
 }
 
+/** Returns all known users (for cross-user review reads). */
+export async function getAllUsers(): Promise<Pick<StoredAccount, 'id' | 'username'>[]> {
+  const custom = await loadAccounts();
+  return getAllAccounts(custom).map(({ id, username }) => ({ id, username }));
+}
+
 interface AuthState {
   user: User | null;
   isLoggedIn: boolean;
