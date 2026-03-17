@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  View, Text, Image, ScrollView, TouchableOpacity,
+  View, Text, Image, ScrollView, TouchableOpacity, Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,6 +21,10 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
 
   const { addMovie, deleteMovie } = useMovieStore();
   const saved = useMovieStore((s) => s.isMovieSaved(String(movieId)));
+  const savedMovie = useMovieStore((s) =>
+    s.savedMovies.find((m) => m.id === String(movieId))
+  );
+  const hasReview = Boolean(savedMovie?.review);
 
   const toggleSaved = () => {
     if (!movie) return;
@@ -35,6 +39,21 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
         overview: movie.overview,
       });
     }
+  };
+
+  const confirmDeleteReview = () => {
+    Alert.alert(
+      'Delete Review',
+      'Remove your review for this movie? The movie will also be removed from My Movies.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => deleteMovie(String(movieId)),
+        },
+      ]
+    );
   };
 
   if (loading) return <LoadingScreen />;
@@ -129,20 +148,62 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              className="rounded-xl py-4 flex-row items-center justify-center gap-2 bg-card border border-border"
-              activeOpacity={0.8}
-              onPress={() =>
-                navigation.navigate('AddReview', {
-                  movieId: movie.id,
-                  movieTitle: movie.title,
-                  moviePoster: movie.poster_path,
-                })
-              }
-            >
-              <Ionicons name="create-outline" size={20} color={Colors.white} />
-              <Text className="text-white text-base font-semibold">Write Review</Text>
-            </TouchableOpacity>
+            {hasReview ? (
+              <>
+                {/* User's review preview */}
+                <View className="bg-background rounded-xl p-4 mb-3">
+                  <View className="flex-row items-center gap-2 mb-2">
+                    <Ionicons name="star" size={14} color={Colors.primary} />
+                    <Text className="text-white text-sm font-semibold">
+                      Your rating: {savedMovie!.rating}/10
+                    </Text>
+                  </View>
+                  <Text className="text-muted text-sm" numberOfLines={3}>
+                    {savedMovie!.review}
+                  </Text>
+                </View>
+
+                <View className="flex-row gap-3">
+                  <TouchableOpacity
+                    className="flex-1 rounded-xl py-4 flex-row items-center justify-center gap-2 bg-card border border-border"
+                    activeOpacity={0.8}
+                    onPress={() =>
+                      navigation.navigate('AddReview', {
+                        movieId: movie.id,
+                        movieTitle: movie.title,
+                        moviePoster: movie.poster_path,
+                      })
+                    }
+                  >
+                    <Ionicons name="create-outline" size={20} color={Colors.white} />
+                    <Text className="text-white text-base font-semibold">Edit Review</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    className="rounded-xl py-4 px-5 flex-row items-center justify-center gap-2 bg-card border border-border"
+                    activeOpacity={0.8}
+                    onPress={confirmDeleteReview}
+                  >
+                    <Ionicons name="trash-outline" size={20} color={Colors.primary} />
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : (
+              <TouchableOpacity
+                className="rounded-xl py-4 flex-row items-center justify-center gap-2 bg-card border border-border"
+                activeOpacity={0.8}
+                onPress={() =>
+                  navigation.navigate('AddReview', {
+                    movieId: movie.id,
+                    movieTitle: movie.title,
+                    moviePoster: movie.poster_path,
+                  })
+                }
+              >
+                <Ionicons name="create-outline" size={20} color={Colors.white} />
+                <Text className="text-white text-base font-semibold">Write Review</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </ScrollView>
