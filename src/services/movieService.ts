@@ -48,8 +48,16 @@ export async function getMovieDetails(id: number): Promise<TMDBMovieDetails> {
 
 export async function getUpcomingMovies(page = 1): Promise<TMDBPagedResponse<TMDBMovie>> {
   if (!hasApiToken) return mockPaged(MOCK_UPCOMING);
-  return tmdbFetch<TMDBPagedResponse<TMDBMovie>>('/movie/upcoming', {
+  const today = new Date().toISOString().slice(0, 10);
+  const future = new Date();
+  future.setMonth(future.getMonth() + 6);
+  const maxDate = future.toISOString().slice(0, 10);
+  return tmdbFetch<TMDBPagedResponse<TMDBMovie>>('/discover/movie', {
     page: String(page),
+    sort_by: 'popularity.desc',
+    with_release_type: '2|3',
+    'release_date.gte': today,
+    'release_date.lte': maxDate,
   });
 }
 

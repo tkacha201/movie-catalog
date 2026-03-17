@@ -27,10 +27,7 @@ function formatDate(dateStr: string): string {
 
 export default function UpcomingScreen() {
   const navigation = useAppNavigation();
-  const { movies: rawMovies, loading, error, refreshing, refresh } = useUpcoming();
-
-  // Filter out movies that have already been released
-  const movies = rawMovies.filter((m) => m.release_date && daysUntil(m.release_date) > 0);
+  const { movies, loading, error, refreshing, refresh } = useUpcoming();
 
   if (loading) return <LoadingScreen />;
 
