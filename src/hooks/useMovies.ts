@@ -13,12 +13,13 @@ export function useMovies() {
     return () => clearTimeout(timeout);
   }, [query]);
 
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery({
+  const { data, isLoading, isError, isRefetching, isFetching, refetch } = useQuery({
     queryKey: ['movies', debouncedQuery],
     queryFn: () =>
       debouncedQuery.trim()
         ? searchMovies(debouncedQuery.trim())
         : discoverMovies(),
+    placeholderData: (prev) => prev,
   });
 
   const refresh = useCallback(() => {
@@ -28,6 +29,7 @@ export function useMovies() {
   return {
     movies: data?.results ?? [],
     loading: isLoading,
+    searching: isFetching && !isLoading,
     error: isError ? 'Failed to load movies.' : null,
     refreshing: isRefetching,
     query,

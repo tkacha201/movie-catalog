@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, Image, TextInput,
-  RefreshControl,
+  RefreshControl, ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { posterSize } from '../services/apiClient';
@@ -13,11 +13,11 @@ import ErrorScreen from '../components/ErrorScreen';
 
 export default function BrowseScreen() {
   const navigation = useAppNavigation();
-  const { movies, loading, error, refreshing, query, setQuery, refresh } = useMovies();
+  const { movies, loading, searching, error, refreshing, query, setQuery, refresh } = useMovies();
 
   if (loading) return <LoadingScreen />;
 
-  if (error) return <ErrorScreen message={error} onRetry={refresh} />;
+  if (error && movies.length === 0) return <ErrorScreen message={error} onRetry={refresh} />;
 
   return (
     <View className="flex-1 bg-background">
@@ -41,6 +41,9 @@ export default function BrowseScreen() {
               <Ionicons name="close-circle" size={20} color={Colors.muted} />
             </TouchableOpacity>
           )}
+          {searching && (
+            <ActivityIndicator size="small" color={Colors.primary} className="ml-2" />
+          )}
         </View>
       </View>
 
@@ -48,6 +51,7 @@ export default function BrowseScreen() {
         data={movies}
         keyExtractor={(item) => String(item.id)}
         numColumns={2}
+        keyboardShouldPersistTaps="handled"
         contentContainerClassName="px-3 pb-5 pt-3"
         columnWrapperClassName="gap-3 mb-3"
         refreshControl={
