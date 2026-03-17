@@ -52,13 +52,15 @@ export async function getUpcomingMovies(page = 1): Promise<TMDBPagedResponse<TMD
   const future = new Date();
   future.setMonth(future.getMonth() + 6);
   const maxDate = future.toISOString().slice(0, 10);
-  return tmdbFetch<TMDBPagedResponse<TMDBMovie>>('/discover/movie', {
+  const response = await tmdbFetch<TMDBPagedResponse<TMDBMovie>>('/discover/movie', {
     page: String(page),
     sort_by: 'popularity.desc',
-    with_release_type: '2|3',
-    'release_date.gte': today,
-    'release_date.lte': maxDate,
+    'primary_release_date.gte': today,
+    'primary_release_date.lte': maxDate,
   });
+  // Filter out any movies whose primary release_date is in the past
+  response.results = response.results.filter((m) => m.release_date >= today);
+  return response;
 }
 
 export async function searchMovies(query: string, page = 1): Promise<TMDBPagedResponse<TMDBMovie>> {
