@@ -23,7 +23,7 @@ const EMPTY_MESSAGES: Record<TabKey, { title: string; subtitle: string; icon: ke
 
 export default function MyMoviesScreen() {
   const navigation = useNavigation();
-  const { savedMovies, deleteMovie } = useMovieStore();
+  const { savedMovies, deleteMovie, updateMovie } = useMovieStore();
   const [activeTab, setActiveTab] = useState<TabKey>('watched');
 
   const filteredMovies = activeTab === 'reviews'
@@ -34,6 +34,17 @@ export default function MyMoviesScreen() {
     Alert.alert('Remove Movie', `Remove "${movie.title}" from your list?`, [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Remove', style: 'destructive', onPress: () => deleteMovie(movie.id) },
+    ]);
+  };
+
+  const confirmClearReview = (movie: SavedMovie) => {
+    Alert.alert('Clear Review', `Remove your review for "${movie.title}"? The movie will stay in your list.`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Clear Review',
+        style: 'destructive',
+        onPress: () => updateMovie(movie.id, { rating: 0, review: '', reviewImageUri: null, recommended: false }),
+      },
     ]);
   };
 
@@ -131,10 +142,10 @@ export default function MyMoviesScreen() {
                   <Text className="text-muted text-xs mt-0.5">{item.releaseDate?.slice(0, 4)}</Text>
                   <TouchableOpacity
                     className="mt-2 bg-background rounded-lg py-2 flex-row items-center justify-center gap-1 border border-border"
-                    onPress={() => confirmDelete(item)}
+                    onPress={() => activeTab === 'reviews' ? confirmClearReview(item) : confirmDelete(item)}
                   >
-                    <Ionicons name="trash-outline" size={14} color={Colors.muted} />
-                    <Text className="text-muted text-xs">Remove</Text>
+                    <Ionicons name={activeTab === 'reviews' ? 'close-circle-outline' : 'trash-outline'} size={14} color={Colors.muted} />
+                    <Text className="text-muted text-xs">{activeTab === 'reviews' ? 'Clear Review' : 'Remove'}</Text>
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>

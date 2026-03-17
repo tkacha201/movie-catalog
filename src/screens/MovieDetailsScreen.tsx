@@ -18,9 +18,9 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
   const { movieId } = route.params;
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const { movie, loading, error } = useMovieDetails(movieId);
+  const { movie, loading, error, refetch } = useMovieDetails(movieId);
 
-  const { addMovie, deleteMovie, setMovieStatus } = useMovieStore();
+  const { addMovie, deleteMovie, setMovieStatus, updateMovie } = useMovieStore();
   const saved = useMovieStore((s) => s.isMovieSaved(String(movieId)));
   const savedMovie = useMovieStore((s) =>
     s.savedMovies.find((m) => m.id === String(movieId))
@@ -28,6 +28,12 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
   const currentStatus = savedMovie?.status ?? null;
   const hasReview = Boolean(savedMovie?.review);
   const { reviews: otherReviews } = useOtherReviews(String(movieId));
+
+  const isUpcoming = movie ? new Date(movie.release_date) > new Date() : false;
+
+  const statusButtons = isUpcoming
+    ? ([{ key: 'wishlist', icon: 'bookmark', label: 'Wishlist' }] as const)
+    : ([{ key: 'watched', icon: 'checkmark-circle', label: 'Watched' }, { key: 'wishlist', icon: 'bookmark', label: 'Wishlist' }] as const);
 
   const handleStatusToggle = (status: MovieStatus) => {
     if (!movie) return;
@@ -38,7 +44,36 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
       releaseDate: movie.release_date,
       overview: movie.overview,
     };
-    setMovieStatus(movieInfo, currentStatus === status ? null : status);
+    const newStatus = currentStatus === status ? null : status;
+
+    // Switching away from watched while a review exists → confirm deletion
+    if (hasReview && currentStatus === 'watched' && newStatus !== 'watched') {
+      Alert.alert(
+        'Delete Review?',
+        newStatus === null
+          ? 'Removing from Watched will also delete your review.'
+          : 'Moving to Wishlist will delete your review.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Continue',
+            style: 'destructive',
+            onPress: () => {
+              updateMovie(String(movie.id), {
+                rating: 0,
+                review: '',
+                reviewImageUri: null,
+                recommended: false,
+              });
+              setMovieStatus(movieInfo, newStatus);
+            },
+          },
+        ]
+      );
+      return;
+    }
+
+    setMovieStatus(movieInfo, newStatus);
   };
 
   const confirmDeleteReview = () => {
@@ -58,7 +93,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
 
   if (loading) return <LoadingScreen />;
 
-  if (error || !movie) return <ErrorScreen message={error ?? 'Movie not found.'} />;
+  if (error || !movie) return <ErrorScreen message={error ?? 'Movie not found.'} onRetry={refetch} />;
 
   const posterUri = movie.poster_path
     ? `${posterSize('w780')}${movie.poster_path}`
@@ -131,12 +166,9 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
             <Text className="text-muted text-[15px] leading-6 mb-6">{movie.overview}</Text>
 
             {/* Status buttons */}
-            <Text className="text-muted text-sm mb-2">Add to list:</Text>
+            <Text className="text-muted text-sm mb-2">{isUpcoming ? 'Save for later:' : 'Add to list:'}</Text>
             <View className="flex-row gap-2 mb-4">
-              {([
-                { key: 'watched', icon: 'checkmark-circle', label: 'Watched' },
-                { key: 'wishlist', icon: 'bookmark', label: 'Wishlist' },
-              ] as const).map(({ key, icon, label }) => {
+              {statusButtons.map(({ key, icon, label }) => {
                 const isActive = currentStatus === key;
                 return (
                   <TouchableOpacity
@@ -160,7 +192,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
               })}
             </View>
 
-            {hasReview ? (
+            {!isUpcoming && hasReview ? (
               <>
                 {/* User's review preview */}
                 <View className="bg-background rounded-xl p-4 mb-3">
@@ -202,7 +234,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
                   </TouchableOpacity>
                 </View>
               </>
-            ) : (
+            ) : !isUpcoming ? (
               <TouchableOpacity
                 className="rounded-xl py-4 flex-row items-center justify-center gap-2 bg-card border border-border"
                 activeOpacity={0.8}
@@ -219,7 +251,7 @@ export default function MovieDetailsScreen({ route }: RootStackScreenProps<'Movi
                 <Ionicons name="create-outline" size={20} color={Colors.white} />
                 <Text className="text-white text-base font-semibold">Write Review</Text>
               </TouchableOpacity>
-            )}
+            ) : null}
 
             {/* Community Reviews */}
             {otherReviews.length > 0 && (
